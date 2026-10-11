@@ -589,7 +589,8 @@
       let n = 0;
       for (const e of G.EnemyMgr.queryCircle(this.x, this.y, 150)) {
         if (e.dead || e.hp >= e.maxHp) continue;
-        e.hp = Math.min(e.maxHp, e.hp + e.maxHp * 0.15);
+        // 7 % (era 15 %: con varios curanderos curaban más de lo que pegabas).
+        e.hp = Math.min(e.maxHp, e.hp + e.maxHp * 0.07);
         G.FX.burst(e.x, e.y - e.bodyH * 0.6, '#7dffb0', 5, 60);
         n++;
       }

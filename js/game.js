@@ -402,7 +402,20 @@ G.Game = (() => {
 
   let frameDt = 0, speedK = 1;
   let fpsShown = 60, fpsAcc = 0, fpsN = 0;
+  // El siguiente fotograma se pide ANTES de nada: si algo falla a mitad, el
+  // juego sigue (antes se quedaba congelado para siempre y había que recargar;
+  // así se perdió una partida enorme al abrirse una grieta).
+  let loopErrs = 0;
   function loop(ts) {
+    requestAnimationFrame(loop);
+    try { frame(ts); }
+    catch (e) {
+      if (loopErrs++ < 5) console.error('[Game] fallo en un fotograma:', e);
+      G.Input.endFrame();
+    }
+  }
+
+  function frame(ts) {
     const real = (ts - last) / 1000 || 0;
     const dt = Math.min(1 / 30, real) * speedK;
     last = ts;
@@ -422,7 +435,6 @@ G.Game = (() => {
     G.UI.tick(dt);
 
     G.Input.endFrame();
-    requestAnimationFrame(loop);
   }
 
   function update(dt) {

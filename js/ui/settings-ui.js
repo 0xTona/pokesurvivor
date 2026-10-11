@@ -116,7 +116,7 @@ G.SettingsUI = (() => {
 
   function renderAccount(box) {
     const st = G.DB.guest ? 'guest' : G.DB.syncState;
-    const SYNC = { ok: 'Guardado en la nube', syncing: 'Guardando…', pending: 'Pendiente de subir (cada 30 s como mucho)',
+    const SYNC = { ok: 'Guardado en la nube', syncing: 'Guardando…', pending: 'Pendiente de subir (se sube al salir del juego)',
                    offline: 'Sin conexión: se subirá al volver', local: 'Guardado sólo en este navegador', guest: 'Invitado: no se guarda' };
     if (G.DB.guest) {
       box.innerHTML = section('Cuenta', 'Estás jugando como <b>invitado</b>: tu progreso no se guarda al salir.')
@@ -146,9 +146,10 @@ G.SettingsUI = (() => {
     const out = $('set-logout'); if (out) out.onclick = () => { close(); leave(); };
     const del = $('set-delete');
     if (del) del.onclick = async () => {
-      if (!confirm('Se borrarán tu cuenta y toda tu partida, para siempre. ¿Seguro?')) return;
+      const ok = await G.UI.confirmDelete();
+      if (!ok) return;
       del.disabled = true;
-      const r = await G.DB.deleteAccount();
+      const r = await G.DB.deleteAccount(ok.pass);
       if (!r.ok) { $('set-msg').textContent = r.error; del.disabled = false; return; }
       close();
       G.UI.toast('Cuenta borrada');

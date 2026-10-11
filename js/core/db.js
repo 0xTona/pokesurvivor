@@ -546,8 +546,13 @@ G.DB = (() => {
     setSync(mode === 'cloud' ? 'ok' : 'local');
   }
 
-  /** Borra la cuenta y la partida (en la nube o en este navegador). */
-  async function deleteAccount() {
+  function nameAccount() { return !!(auth && auth.currentUser && (auth.currentUser.email || '').endsWith('@' + NAME_DOMAIN)); }
+
+  /**
+   * Borra la cuenta y la partida (en la nube o en este navegador).
+   * @param pass  contraseña (cuentas de nombre y contraseña)
+   */
+  async function deleteAccount(pass) {
     if (guest || !key) return { ok: false, error: 'No hay cuenta que borrar.' };
     if (mode === 'local') {
       const accs = read(K_ACC) || {};
@@ -558,6 +563,17 @@ G.DB = (() => {
       return { ok: true };
     }
     try {
+      // Primero se confirma quién eres: Firebase sólo deja borrar la cuenta si
+      // se ha entrado hace poco. Antes se borraban los datos y luego fallaba
+      // ese último paso: la cuenta quedaba vacía pero existía y su nombre no
+      // se podía volver a usar.
+      const cu = auth.currentUser;
+      if (nameAccount()) {
+        if (!pass) return { ok: false, error: 'Escribe tu contraseña.' };
+        await cu.reauthenticateWithCredential(firebase.auth.EmailAuthProvider.credential(cu.email, pass));
+      } else {
+        await cu.reauthenticateWithPopup(new firebase.auth.GoogleAuthProvider());
+      }
       clearTimeout(pushT); clearTimeout(retryT); pending = false;
       stopListening();
       for (const fn of leaveHooks) await fn('delete');
@@ -604,7 +620,7 @@ G.DB = (() => {
     /** ¿Está disponible lo online (amigos, ranking, multijugador)? */
     get online() { return mode === 'cloud' && !guest && !!uid && !!save; },
     /** ¿La cuenta es de usuario y contraseña (no de Google)? */
-    get nameAccount() { return !!(auth && auth.currentUser && (auth.currentUser.email || '').endsWith('@' + NAME_DOMAIN)); },
+    get nameAccount() { return nameAccount(); },
     get mode() { return mode; },
     get localReason() { return localReason; },
     get syncState() { return syncState; },
