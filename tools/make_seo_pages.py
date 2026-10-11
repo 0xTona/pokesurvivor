@@ -77,10 +77,12 @@ def page(pid, lang, title, desc, body, ld=None):
     switch = f'<a class="lang" hreflang="{other}" href="{rel(me, PATH[other][pid])}">{"English" if lang == "es" else "Español"}</a>'
     legal = ('PokéSurvivor es un juego de fans <b>gratuito y sin ánimo de lucro</b>, sin anuncios ni compras (sólo donaciones voluntarias para los servidores). No está afiliado a Nintendo, Creatures, '
              'GAME FREAK ni The Pokémon Company; Pokémon y sus personajes son propiedad de sus respectivos dueños. Sprites de PMD SpriteCollab '
-             '(CC BY-NC 4.0) · datos de PokéAPI · música y sonidos originales.') if lang == 'es' else (
+             '(CC BY-NC 4.0) · datos de PokéAPI · música y sonidos originales. No tiene ninguna criptomoneda ni token oficial: '
+             'cualquiera que use su nombre es de terceros y no nos hacemos cargo de compras ni inversiones.') if lang == 'es' else (
              'PokéSurvivor is a <b>free, non-profit</b> fan game with no ads or purchases (only voluntary donations for the servers). It is not affiliated with Nintendo, Creatures, GAME FREAK '
              'or The Pokémon Company; Pokémon and its characters are owned by their respective owners. Sprites from PMD SpriteCollab (CC BY-NC 4.0) '
-             '· data from PokéAPI · original music and sounds.')
+             '· data from PokéAPI · original music and sounds. It has no official cryptocurrency or token: any using its name '
+             'belongs to third parties and we take no responsibility for purchases or investments.')
     ldj = ('<script type="application/ld+json">\n' + json.dumps(ld, ensure_ascii=False) + '\n</script>') if ld else ''
     return f'''<!doctype html>
 <html lang="{lang}">

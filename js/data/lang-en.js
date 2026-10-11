@@ -166,6 +166,9 @@ G.I18n.add({
   '¡Has conseguido a {x} shiny!': 'You got a shiny {x}!', '¡Otro {x} shiny! (+300 monedas)': 'Another shiny {x}! (+300 coins)',
   '¡{x} te esperaba en la grieta!': '{x} was waiting in the rift!', '¡{x} shiny te esperaba en la grieta!': 'A shiny {x} was waiting in the rift!',
   '¡Has vencido a {x}! Recoge el premio…': 'You defeated {x}! Grab your reward…',
+  'Criptomonedas': 'Cryptocurrencies',
+  'PokéSurvivor no tiene ninguna criptomoneda, token ni NFT oficial, y su autor no ha creado ninguno. Cualquier token que use el nombre del juego lo han creado terceros: no nos hacemos cargo de ninguna compra, venta o inversión que hagas con ellos, y nada de lo que hay aquí es una recomendación de inversión.':
+    "PokéSurvivor has no official cryptocurrency, token or NFT, and its author has not created any. Any token using the game's name was created by third parties: we take no responsibility for any purchase, sale or investment you make with them, and nothing here is investment advice.",
   '¡Vínculo!': 'Bond!', 'Vínculo': 'Bond', 'Atrás': 'Back',
   'Los movimientos unidos se lanzan a la vez y ocupan un solo hueco': 'Bonded moves fire at the same time and take a single slot',
   'Elige qué movimiento se une a {x}': 'Choose which move joins {x}',
