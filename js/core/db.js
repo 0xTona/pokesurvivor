@@ -428,6 +428,9 @@ G.DB = (() => {
       'unavailable': 'Sin conexión con la base de datos.'
     };
     if (c === 'auth/popup-closed-by-user' || c === 'auth/cancelled-popup-request') return '';
+    // El "portero" de Firebase (functions/index.js) ha rechazado la cuenta nueva: tope del mes.
+    if (/error-code:-47|BLOCKING_FUNCTION|resource-exhausted|cuentas nuevas/i.test(c + ' ' + ((e && e.message) || '')))
+      return 'Este mes ya no quedan plazas para cuentas nuevas (vuelven el 1 de ' + (G.Signups ? G.Signups.nextMonthName() : 'mes que viene') + '). Mientras, puedes jugar como invitado.';
     return M[c] || ('Error: ' + (c || (e && e.message) || 'desconocido'));
   }
 

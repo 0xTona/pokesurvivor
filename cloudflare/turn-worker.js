@@ -27,6 +27,10 @@
  * uno. El juego avisa aquí (con su token) la primera vez que entra cada cuenta
  * en el mes; al llegar a LIMIT, GET /mau dice open:false y el juego quita
  * "Crear cuenta" hasta el mes siguiente (los invitados no cuentan nunca).
+ * /mau/new — lo llama el "portero" de Firebase (functions/index.js) ANTES de
+ * crear cualquier cuenta, venga del juego o no: apunta la cuenta y dice si se
+ * puede crear. Protegido con la clave MAU_SECRET (secreto del Worker y de la
+ * función), así nadie más puede tocar el contador.
  */
 const PROJECT = 'pokesurvivor-jpter';
 const ORIGINS = ['https://pokesurvivor.com', 'https://www.pokesurvivor.com', 'http://127.0.0.1:8765', 'http://localhost:8765'];
@@ -72,6 +76,13 @@ export default {
     const origin = req.headers.get('Origin') || '';
     const h = cors(origin);
     if (req.method === 'OPTIONS') return new Response(null, { status: 204, headers: h });
+    if (new URL(req.url).pathname === '/mau/new') {
+      if (!env.MAU_SECRET || req.headers.get('X-PS-Secret') !== env.MAU_SECRET) return new Response('{"error":"no autorizado"}', { status: 401 });
+      const uid = new URL(req.url).searchParams.get('uid') || '';
+      if (!/^[A-Za-z0-9]{10,128}$/.test(uid)) return new Response('{"error":"uid"}', { status: 400 });
+      const r = await env.MAU.get(env.MAU.idFromName(monthKey())).fetch('https://mau/?new=1&uid=' + encodeURIComponent(uid));
+      return new Response(r.body, { status: r.status, headers: { 'content-type': 'application/json' } });
+    }
     if (new URL(req.url).pathname === '/mau') {
       const stub = env.MAU.get(env.MAU.idFromName(monthKey()));
       let uid = '';
@@ -145,9 +156,13 @@ export class Mau {
   constructor(ctx) { this.ctx = ctx; }
 
   async fetch(req) {
-    const uid = new URL(req.url).searchParams.get('uid') || '';
+    const q = new URL(req.url).searchParams;
+    const uid = q.get('uid') || '';
     let n = (await this.ctx.storage.get('n')) || 0;
-    if (uid && !(await this.ctx.storage.get('u:' + uid))) {
+    const known = uid && (await this.ctx.storage.get('u:' + uid));
+    // Cuenta NUEVA con el tope alcanzado: no se apunta y se dice que no.
+    if (q.get('new') && !known && n >= LIMIT) return new Response(JSON.stringify({ n, limit: LIMIT, open: false }));
+    if (uid && !known) {
       n++;
       await this.ctx.storage.put({ ['u:' + uid]: 1, n });
     }
