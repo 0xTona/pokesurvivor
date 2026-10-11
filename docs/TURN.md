@@ -38,3 +38,16 @@ Piezas:
    (no hay que tocar los registros de GitHub).
 
 Cuando esté, avisa: se comprueba que el Worker da claves y se sube el juego.
+
+## Contador "N jugando ahora" (mismo Worker)
+
+El Worker también tiene la ruta `/online`: cada pestaña avisa al abrir el juego y
+cada 20 min, y un Durable Object (`Online`, gratis en el plan Free) cuenta las
+sesiones de los últimos 25 min. No usa Firebase. Si se acaba el cupo gratis del
+día (100.000 llamadas), el contador no sale y nada más: el plan Free no cobra.
+
+Como necesita el Durable Object, este Worker se despliega con wrangler desde la
+carpeta `cloudflare/` (ver `wrangler.toml`; las claves del TURN se conservan):
+
+    npx wrangler login      (una vez)
+    npx wrangler deploy

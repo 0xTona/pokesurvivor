@@ -15,6 +15,12 @@
  *   TURN_KEY_API_TOKEN  el "API Token" de esa misma clave
  * Dominio: turn.pokesurvivor.com (Settings -> Domains & Routes -> Custom domain).
  * Ver docs/TURN.md.
+ *
+ * /online — contador aproximado de gente jugando (sin coste: plan gratis de
+ * Workers). Cada pestaña avisa al abrir y cada 20 min con un id de sesión; un
+ * Durable Object ("Online") recuerda quién ha avisado en los últimos 25 min y
+ * devuelve cuántos son. Si se pasa del cupo gratis del día, simplemente falla
+ * y el juego no enseña el número. Se despliega con wrangler (wrangler.toml).
  */
 const PROJECT = 'pokesurvivor-jpter';
 const ORIGINS = ['https://pokesurvivor.com', 'https://www.pokesurvivor.com', 'http://127.0.0.1:8765', 'http://localhost:8765'];
@@ -27,7 +33,7 @@ function cors(origin) {
   return {
     'Access-Control-Allow-Origin': ORIGINS.includes(origin) ? origin : ORIGINS[0],
     'Access-Control-Allow-Headers': 'Authorization',
-    'Access-Control-Allow-Methods': 'GET, OPTIONS',
+    'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
     'Vary': 'Origin'
   };
 }
@@ -60,6 +66,10 @@ export default {
     const origin = req.headers.get('Origin') || '';
     const h = cors(origin);
     if (req.method === 'OPTIONS') return new Response(null, { status: 204, headers: h });
+    if (new URL(req.url).pathname === '/online') {
+      const r = await env.ONLINE.get(env.ONLINE.idFromName('global')).fetch(req);
+      return new Response(r.body, { status: r.status, headers: { ...h, 'content-type': 'application/json', 'cache-control': 'no-store' } });
+    }
     const uid = await verify((req.headers.get('Authorization') || '').replace(/^Bearer\s+/i, ''));
     if (!uid) return new Response(JSON.stringify({ error: 'no autorizado' }), { status: 401, headers: { ...h, 'content-type': 'application/json' } });
     const r = await fetch(`https://rtc.live.cloudflare.com/v1/turn/keys/${env.TURN_KEY_ID}/credentials/generate-ice-servers`, {
@@ -74,3 +84,36 @@ export default {
     });
   }
 };
+
+// ---------------- contador de gente en línea ----------------
+
+const WINDOW = 25 * 60 * 1000;               // cuenta a quien ha avisado en los últimos 25 min
+const PER_IP = 6;                            // como mucho 6 pestañas por conexión (contra trampas)
+
+export class Online {
+  // sid -> { t, ip }. Se guarda en el almacenamiento del Durable Object como
+  // mucho una vez por minuto: si Cloudflare lo reinicia, no vuelve a cero.
+  constructor(ctx) {
+    this.ctx = ctx; this.seen = new Map(); this.prunedAt = 0; this.savedAt = 0;
+    ctx.blockConcurrencyWhile(async () => {
+      const saved = await ctx.storage.get('seen');
+      if (saved) this.seen = new Map(saved);
+    });
+  }
+
+  async fetch(req) {
+    const url = new URL(req.url);
+    const sid = (url.searchParams.get('sid') || '').slice(0, 40);
+    const ip = req.headers.get('CF-Connecting-IP') || '';
+    const now = Date.now();
+    if (now - this.prunedAt > 60e3) {
+      for (const [k, v] of this.seen) if (now - v.t > WINDOW) this.seen.delete(k);
+      this.prunedAt = now;
+    }
+    if (/^[a-z0-9]{8,40}$/i.test(sid) && (this.seen.has(sid) || this.countIp(ip) < PER_IP)) this.seen.set(sid, { t: now, ip });
+    if (now - this.savedAt > 60e3) { this.savedAt = now; await this.ctx.storage.put('seen', [...this.seen]); }
+    return new Response(JSON.stringify({ n: this.seen.size }));
+  }
+
+  countIp(ip) { let n = 0; for (const v of this.seen.values()) if (v.ip === ip) n++; return n; }
+}
