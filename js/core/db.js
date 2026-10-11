@@ -466,6 +466,7 @@ G.DB = (() => {
     try {
       const legacy = await legacySave(name, pass);
       const cred = await auth.createUserWithEmailAndPassword(nameToEmail(name), pass);
+      if (G.Signups) G.Signups.markNew(cred.user.uid);   // ya la apuntó el portero
       await openCloud(cred.user, { name, legacy });
       return { ok: true, isNew: !save.partner, imported: !!legacy };
     } catch (e) { return { ok: false, error: authError(e) }; }
@@ -492,6 +493,7 @@ G.DB = (() => {
         await auth.signOut().catch(() => {});
         return { ok: false, error: 'Este mes ya no quedan plazas para cuentas nuevas (vuelven el 1 de ' + G.Signups.nextMonthName() + '). Mientras, puedes jugar como invitado.' };
       }
+      if (cred.additionalUserInfo && cred.additionalUserInfo.isNewUser && G.Signups) G.Signups.markNew(cred.user.uid);
       await openCloud(cred.user, { name: displayNameOf(cred.user) });
       return { ok: true, isNew: !save.partner };
     } catch (e) { return { ok: false, error: authError(e) }; }

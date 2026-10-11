@@ -21,6 +21,8 @@
  * Durable Object ("Online") recuerda quién ha avisado en los últimos 25 min y
  * devuelve cuántos son. Si se pasa del cupo gratis del día, simplemente falla
  * y el juego no enseña el número. Se despliega con wrangler (wrangler.toml).
+ * QUITADO DEL JUEGO el 11-10-2026: se llevaba la mitad de las 100.000 llamadas
+ * diarias del plan gratis. La ruta sigue sólo para pestañas que sigan abiertas.
  *
  * /mau — tope de cuentas del mes. Firebase (Identity Platform) da 50.000
  * usuarios con cuenta activos al mes gratis y después cobra ~0,0055 $ por cada
@@ -44,6 +46,7 @@ function cors(origin) {
     'Access-Control-Allow-Origin': ORIGINS.includes(origin) ? origin : ORIGINS[0],
     'Access-Control-Allow-Headers': 'Authorization',
     'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+    'Access-Control-Max-Age': '86400',          // el navegador no repite la consulta OPTIONS (cada una cuenta)
     'Vary': 'Origin'
   };
 }
@@ -95,7 +98,9 @@ export default {
       const stub = env.MAU.get(env.MAU.idFromName(monthKey()));
       let uid = '';
       if (req.method === 'POST') {
-        uid = await verify((req.headers.get('Authorization') || '').replace(/^Bearer\s+/i, ''));
+        // El token va en el cuerpo (text/plain, sin OPTIONS previo) o, en juegos antiguos, en Authorization.
+        const tok = (req.headers.get('Authorization') || '').replace(/^Bearer\s+/i, '') || (await req.text()).trim().slice(0, 4096);
+        uid = await verify(tok);
         if (!uid) return new Response(JSON.stringify({ error: 'no autorizado' }), { status: 401, headers: { ...h, 'content-type': 'application/json' } });
       }
       const r = await stub.fetch('https://mau/?uid=' + encodeURIComponent(uid));
