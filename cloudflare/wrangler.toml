@@ -13,6 +13,14 @@ routes = [ { pattern = "turn.pokesurvivor.com", custom_domain = true } ]
 name = "ONLINE"
 class_name = "Online"
 
+[[durable_objects.bindings]]
+name = "MAU"
+class_name = "Mau"
+
 [[migrations]]
 tag = "v1"
 new_sqlite_classes = ["Online"]
+
+[[migrations]]
+tag = "v2"
+new_sqlite_classes = ["Mau"]

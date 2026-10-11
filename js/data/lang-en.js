@@ -495,5 +495,9 @@ G.I18n.add({
   '¡Un {x} con un ticket ×10! ¡Atrápalo antes de que huya!': 'A {x} with a ×10 ticket! Catch it before it runs away!',
   '¡Un {x} cargado de monedas! ¡Atrápalo antes de que huya!': 'A {x} loaded with coins! Catch it before it runs away!',
   '¡{x} se ha escapado!': '{x} got away!', 'HORA DORADA · {x} s': 'GOLDEN HOUR · {x} s', 'HORDA {x} · {x} s': '{x} HORDE · {x} s',
-  'Marca · {x} m': 'Marker · {x} m'
+  'Marca · {x} m': 'Marker · {x} m',
+  '¿Te está gustando PokéSurvivor? Lo hago yo solo y los servidores cuestan dinero. Si quieres, puedes ayudarme a mantenerlo en línea.': "Enjoying PokéSurvivor? I make it on my own and the servers cost money. If you'd like, you can help keep it online.",
+  'Apoyar en Ko-fi': 'Support on Ko-fi', 'Entrar con Google (si ya tienes cuenta)': 'Sign in with Google (if you already have an account)',
+  'Este mes se han llenado las plazas de cuentas nuevas: vuelven el 1 de {x}. Si ya tienes cuenta, entra normal. Si no, juega como invitado.': "New accounts are full for this month: they reopen on {x} 1. If you already have an account, sign in as usual. If not, play as a guest.",
+  'Este mes ya no quedan plazas para cuentas nuevas (vuelven el 1 de {x}). Mientras, puedes jugar como invitado.': 'There are no new account slots left this month (they reopen on {x} 1). Meanwhile, you can play as a guest.'
 });

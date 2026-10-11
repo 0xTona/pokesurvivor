@@ -21,6 +21,12 @@
  * Durable Object ("Online") recuerda quién ha avisado en los últimos 25 min y
  * devuelve cuántos son. Si se pasa del cupo gratis del día, simplemente falla
  * y el juego no enseña el número. Se despliega con wrangler (wrangler.toml).
+ *
+ * /mau — tope de cuentas del mes. Firebase (Identity Platform) da 50.000
+ * usuarios con cuenta activos al mes gratis y después cobra ~0,0055 $ por cada
+ * uno. El juego avisa aquí (con su token) la primera vez que entra cada cuenta
+ * en el mes; al llegar a LIMIT, GET /mau dice open:false y el juego quita
+ * "Crear cuenta" hasta el mes siguiente (los invitados no cuentan nunca).
  */
 const PROJECT = 'pokesurvivor-jpter';
 const ORIGINS = ['https://pokesurvivor.com', 'https://www.pokesurvivor.com', 'http://127.0.0.1:8765', 'http://localhost:8765'];
@@ -66,6 +72,16 @@ export default {
     const origin = req.headers.get('Origin') || '';
     const h = cors(origin);
     if (req.method === 'OPTIONS') return new Response(null, { status: 204, headers: h });
+    if (new URL(req.url).pathname === '/mau') {
+      const stub = env.MAU.get(env.MAU.idFromName(monthKey()));
+      let uid = '';
+      if (req.method === 'POST') {
+        uid = await verify((req.headers.get('Authorization') || '').replace(/^Bearer\s+/i, ''));
+        if (!uid) return new Response(JSON.stringify({ error: 'no autorizado' }), { status: 401, headers: { ...h, 'content-type': 'application/json' } });
+      }
+      const r = await stub.fetch('https://mau/?uid=' + encodeURIComponent(uid));
+      return new Response(r.body, { status: r.status, headers: { ...h, 'content-type': 'application/json', 'cache-control': 'no-store' } });
+    }
     if (new URL(req.url).pathname === '/online') {
       const r = await env.ONLINE.get(env.ONLINE.idFromName('global')).fetch(req);
       return new Response(r.body, { status: r.status, headers: { ...h, 'content-type': 'application/json', 'cache-control': 'no-store' } });
@@ -116,4 +132,25 @@ export class Online {
   }
 
   countIp(ip) { let n = 0; for (const v of this.seen.values()) if (v.ip === ip) n++; return n; }
+}
+
+// ---------------- tope de cuentas del mes ----------------
+
+const LIMIT = 48000;          // por debajo de las 50.000 gratis (margen por el retraso)
+
+/** Mes de facturación de Google (hora del Pacífico, aproximada). */
+function monthKey() { return new Date(Date.now() - 8 * 3600e3).toISOString().slice(0, 7); }
+
+export class Mau {
+  constructor(ctx) { this.ctx = ctx; }
+
+  async fetch(req) {
+    const uid = new URL(req.url).searchParams.get('uid') || '';
+    let n = (await this.ctx.storage.get('n')) || 0;
+    if (uid && !(await this.ctx.storage.get('u:' + uid))) {
+      n++;
+      await this.ctx.storage.put({ ['u:' + uid]: 1, n });
+    }
+    return new Response(JSON.stringify({ n, limit: LIMIT, open: n < LIMIT }));
+  }
 }

@@ -48,9 +48,22 @@ G.LoginUI = (() => {
     $('login-err').textContent = '';
   }
 
+  /** Tope de cuentas del mes alcanzado: sin "Crear cuenta" hasta el mes siguiente. */
+  function applySignups(open) {
+    const reg = document.querySelector('#scr-login .tab[data-tab="register"]');
+    if (reg) reg.classList.toggle('hidden', !open);
+    if (!open && mode === 'register') setMode('login');
+    const note = $('signup-closed');
+    note.classList.toggle('hidden', open);
+    if (!open) note.textContent = 'Este mes se han llenado las plazas de cuentas nuevas: vuelven el 1 de ' + G.Signups.nextMonthName() +
+      '. Si ya tienes cuenta, entra normal. Si no, juega como invitado.';
+    $('btn-google').textContent = open ? 'Entrar con Google' : 'Entrar con Google (si ya tienes cuenta)';
+  }
+
   function open() {
     G.UI.chrome(false);
     G.UI.show('scr-login');
+    if (G.DB.mode === 'cloud' && G.Signups) G.Signups.check().then(applySignups);
     if (!G.DB.storageOk) $('login-err').textContent = 'Este navegador no deja guardar datos: juega como invitado.';
     $('btn-google').classList.toggle('hidden', G.DB.mode !== 'cloud');
     $('login-mode').textContent = modeNote();
