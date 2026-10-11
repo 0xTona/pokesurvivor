@@ -76,6 +76,14 @@ export default {
     const origin = req.headers.get('Origin') || '';
     const h = cors(origin);
     if (req.method === 'OPTIONS') return new Response(null, { status: 204, headers: h });
+    // Ajuste manual (con la clave): el contador del mes no puede ser menor que N
+    // (p. ej. las cuentas que entraron antes de que existiera el contador).
+    if (new URL(req.url).pathname === '/mau/seed') {
+      if (!env.MAU_SECRET || req.headers.get('X-PS-Secret') !== env.MAU_SECRET) return new Response('{"error":"no autorizado"}', { status: 401 });
+      const n = parseInt(new URL(req.url).searchParams.get('n') || '0', 10);
+      const r = await env.MAU.get(env.MAU.idFromName(monthKey())).fetch('https://mau/?seed=' + (n > 0 ? n : 0));
+      return new Response(r.body, { status: r.status, headers: { 'content-type': 'application/json' } });
+    }
     if (new URL(req.url).pathname === '/mau/new') {
       if (!env.MAU_SECRET || req.headers.get('X-PS-Secret') !== env.MAU_SECRET) return new Response('{"error":"no autorizado"}', { status: 401 });
       const uid = new URL(req.url).searchParams.get('uid') || '';
@@ -94,7 +102,8 @@ export default {
       return new Response(r.body, { status: r.status, headers: { ...h, 'content-type': 'application/json', 'cache-control': 'no-store' } });
     }
     if (new URL(req.url).pathname === '/online') {
-      const r = await env.ONLINE.get(env.ONLINE.idFromName('global')).fetch(req);
+      // ?s=1: el recuento por muestreo (1 de cada 10 pestañas avisa); sin él, el antiguo.
+      const r = await env.ONLINE.get(env.ONLINE.idFromName(new URL(req.url).searchParams.get('s') ? 'sample' : 'global')).fetch(req);
       return new Response(r.body, { status: r.status, headers: { ...h, 'content-type': 'application/json', 'cache-control': 'no-store' } });
     }
     const uid = await verify((req.headers.get('Authorization') || '').replace(/^Bearer\s+/i, ''));
@@ -159,6 +168,8 @@ export class Mau {
     const q = new URL(req.url).searchParams;
     const uid = q.get('uid') || '';
     let n = (await this.ctx.storage.get('n')) || 0;
+    const seed = parseInt(q.get('seed') || '0', 10);
+    if (seed > n) { n = seed; await this.ctx.storage.put('n', n); }
     const known = uid && (await this.ctx.storage.get('u:' + uid));
     // Cuenta NUEVA con el tope alcanzado: no se apunta y se dice que no.
     if (q.get('new') && !known && n >= LIMIT) return new Response(JSON.stringify({ n, limit: LIMIT, open: false }));
@@ -166,6 +177,6 @@ export class Mau {
       n++;
       await this.ctx.storage.put({ ['u:' + uid]: 1, n });
     }
-    return new Response(JSON.stringify({ n, limit: LIMIT, open: n < LIMIT }));
+    return new Response(JSON.stringify({ n, limit: LIMIT, open: n < LIMIT, v: 2 }));
   }
 }
