@@ -7,6 +7,20 @@ shinies y gacha por región. Música y efectos compuestos para el juego.
 HTML + CSS + JavaScript vanilla sobre Canvas 2D. Sin build, sin dependencias y
 **todo local**: no necesita internet para jugar.
 
+> **Aviso sobre criptomonedas / Crypto disclaimer**
+>
+> PokéSurvivor **no tiene ninguna criptomoneda, token ni NFT oficial**, y yo no
+> he creado ninguno. Cualquier token que use el nombre del juego lo han creado
+> terceros. **No me hago cargo de ninguna compra, venta o inversión** que hagas
+> con ellos y nada de lo que hay aquí es una recomendación de inversión. El
+> juego es gratis y lo seguirá siendo.
+>
+> PokéSurvivor has **no official cryptocurrency, token or NFT**, and I have not
+> created any. Any token using the game's name was created by third parties.
+> **I take no responsibility for any purchase, sale or investment** you make
+> with them, and nothing here is investment advice. The game is free and will
+> stay free.
+
 ## Jugar
 
 Doble clic en `index.html`. Crea una cuenta o entra como invitado, haz el test
@@ -25,7 +39,9 @@ cambiarlo y el botón de arriba a la derecha para pausar. Se puede instalar como
 app ("Añadir a pantalla de inicio"). En **Ajustes** hay sonido, calidad gráfica
 (con modo automático), números de daño, menos sacudidas, FPS y la cuenta.
 
-El Pokémon ataca solo con el movimiento activo. Las rocas, cofres y la hierba
+El Pokémon ataca solo con el movimiento activo (o con todos los de un
+**vínculo**: cada legendario vencido deja fusionar movimientos para lanzarlos a
+la vez desde un solo hueco, hasta 4). Las rocas, cofres y la hierba
 alta se rompen; las paredes y los árboles bloquean los disparos enemigos; el
 agua frena y la lava quema (también a los enemigos).
 
