@@ -99,7 +99,10 @@ def page(pid, lang, title, desc, body, ld=None):
 <meta property="og:description" content="{esc(desc)}">
 <meta property="og:image" content="{SITE}assets/og-image.jpg">
 <meta name="twitter:card" content="summary_large_image">
-<link rel="icon" type="image/png" href="{up}assets/icons/icon-32.png">
+<link rel="icon" href="{up}favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="48x48" href="{up}assets/icons/icon-48.png">
+<link rel="icon" type="image/png" sizes="96x96" href="{up}assets/icons/icon-96.png">
+<link rel="icon" type="image/png" sizes="144x144" href="{up}assets/icons/icon-144.png">
 <link rel="apple-touch-icon" href="{up}assets/icons/icon-180.png">
 <link rel="stylesheet" href="{up}css/pages.css">
 {ldj}
@@ -579,7 +582,7 @@ def game_en():
 # ================= 404, robots y sitemap =================
 def extra():
     nf = '''<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="robots" content="noindex"><title>404 · PokéSurvivor</title><link rel="icon" href="/assets/icons/icon-32.png"><link rel="stylesheet" href="/css/pages.css"></head>
+<meta name="robots" content="noindex"><title>404 · PokéSurvivor</title><link rel="icon" href="/favicon.ico" sizes="any"><link rel="icon" type="image/png" sizes="48x48" href="/assets/icons/icon-48.png"><link rel="stylesheet" href="/css/pages.css"></head>
 <body><header class="top"><a class="brand" href="/">PokéSurvivor</a><nav><a href="/guia/">Guía</a><a href="/en/">English</a><a class="play" href="/">Jugar gratis</a></nav></header>
 <main><article class="doc center"><h1>404 · Te has perdido en la mazmorra</h1><p class="lead">Esta página no existe. Pero las hordas siguen esperando…</p>
 <p class="lead" lang="en">This page doesn't exist. But the hordes are still waiting…</p>

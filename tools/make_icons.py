@@ -55,7 +55,10 @@ def icon(size, maskable=False):
         d.rectangle([x - 3 * s, y - s, x + 3 * s - 1, y + s - 1], fill=GOLD)
     return img
 
-for size in (512, 192, 180, 32):
+# Google sólo enseña en los resultados iconos cuadrados de 48 px o múltiplos (48, 96, 144...).
+for size in (512, 192, 180, 144, 96, 48, 32):
     icon(size).save(os.path.join(OUT, f'icon-{size}.png'))
 icon(512, True).save(os.path.join(OUT, 'icon-maskable-512.png'))
+# favicon.ico en la raíz de la web: lo primero que piden Google y los navegadores.
+icon(48).save(os.path.join(OUT, '..', '..', 'favicon.ico'), sizes=[(16, 16), (32, 32), (48, 48)])
 print('ok', os.listdir(OUT))
