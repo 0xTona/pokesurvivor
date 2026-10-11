@@ -401,6 +401,16 @@
       cd: 0.9, dmg: 17, count: 4, radius: 150, hex: 1.7 }
   ];
 
+  // Cuerpo a cuerpo (12-10-2026): +20 % de daño y +25 % de alcance y de arco
+  // (y -25 % de daño recibido mientras sea tu ataque activo, en player.js).
+  // Pegaban bien, pero había que arriesgar mucho más que con los de distancia.
+  for (const m of RAW) {
+    if (m.kind !== 'melee') continue;
+    m.dmg = Math.round(m.dmg * 1.2);
+    m.radius = Math.round(m.radius * 1.25);
+    if (m.arc) m.arc = Math.min(3, +(m.arc * 1.25).toFixed(2));
+  }
+
   // Pool de movimientos por tipo. El pool `normal` lo tienen todos.
   const POOL = {};
   for (const m of RAW) (POOL[m.type] = POOL[m.type] || []).push(m.id);

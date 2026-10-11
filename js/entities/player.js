@@ -199,7 +199,10 @@ G.Player = class Player {
       eff = G.Types.label(k);
       amount *= k * G.Weather.mult(type);
     }
-    const d = Math.max(1, amount * (1 - this.reduction));
+    // Con un ataque cuerpo a cuerpo activo se recibe un 25 % menos: hay que
+    // estar encima de los enemigos para pegar (iban muy por detrás).
+    const close = this.activeGroup().some(m => m.kind === 'melee') ? 0.75 : 1;
+    const d = Math.max(1, amount * (1 - this.reduction) * close);
     this.hp -= d;
     this.invuln = 0.45;
     this.flash = 0.14;
