@@ -31,9 +31,11 @@ G.Player = class Player {
     this.baseSpd = mon.spd;
     this.baseAtk = mon.atk;
 
-    this.moves = [];
-    this.active = 0;
-    this.maxMoves = 4;
+    this.moves = [];           // todos los movimientos aprendidos
+    this.slots = [];           // huecos: cada uno, una lista de movimientos que se lanzan a la vez
+    this.active = 0;           // hueco activo
+    this.maxMoves = 4;         // huecos
+    this.bonds = 0;            // vínculos por usar (premio de los legendarios)
 
     this.buffs = {
       atk: { n: 0, t: 0, amount: 0 },
@@ -91,35 +93,74 @@ G.Player = class Player {
 
   // ---------------- movimientos ----------------
   addMove(id) {
-    if (this.moves.length >= this.maxMoves || this.hasMove(id)) return false;
-    this.moves.push(G.Moves.instance(id, 1));
-    this.setActive(this.moves.length - 1);
+    if (this.slots.length >= this.maxMoves || this.hasMove(id)) return false;
+    const m = G.Moves.instance(id, 1);
+    this.moves.push(m);
+    this.slots.push([m]);
+    // Se cambia al nuevo, salvo si estás usando un vínculo (no te quita el grupo).
+    if (!(this.slots[this.active] && this.slots[this.active].length > 1)) this.setActive(this.slots.length - 1);
     return true;
   }
 
   hasMove(id) { return this.moves.some(m => m.id === id); }
 
   setActive(i) {
-    if (i < 0 || i >= this.moves.length || i === this.active) return;
+    if (i < 0 || i >= this.slots.length || i === this.active) return;
     // Cinta Elección: no se puede cambiar de movimiento.
-    if (this.hasItem('choiceband') && this.moves[this.active]) {
+    if (this.hasItem('choiceband') && this.slots[this.active]) {
       G.FX.dmgText(this.x, this.y - this.bodyH - 8, 'Cinta Elección', '#ff8ad8');
       return;
     }
     this.active = i;
     G.Projectiles.clearOrbs(this);
     G.Audio.sfx('select');
-    const m = this.moves[i];
-    m.t = Math.min(m.t, m.cd * 0.35);
+    for (const m of this.slots[i]) m.t = Math.min(m.t, m.cd * 0.35);
+    const m = this.slots[i][0];
     G.FX.ring(this.x, this.y - G.LIFT * 0.5, 6, this.r * 3.4, G.U.TYPE_COLOR[m.type], 0.3, 3);
   }
 
   cycle(dir) {
-    if (!this.moves.length) return;
-    this.setActive((this.active + dir + this.moves.length) % this.moves.length);
+    if (!this.slots.length) return;
+    this.setActive((this.active + dir + this.slots.length) % this.slots.length);
   }
 
-  activeMove() { return this.moves[this.active]; }
+  // ---------------- vínculos (fusiones) ----------------
+  // Cada legendario vencido da un vínculo. Con él se juntan movimientos en un
+  // solo hueco y se lanzan a la vez. Sólo crece un grupo (hasta BOND_MAX); si
+  // no hay ninguno a medias, el vínculo une dos movimientos sueltos.
+  static get BOND_MAX() { return 4; }
+
+  /** Lo que se puede hacer ahora con un vínculo: añadir a un grupo o unir dos sueltos. */
+  bondOptions() {
+    const loose = this.slots.filter(s => s.length === 1).map(s => s[0]);
+    const grow = this.slots.find(s => s.length > 1 && s.length < Player.BOND_MAX);
+    if (grow) return loose.length ? { mode: 'add', group: grow, loose } : null;
+    return loose.length >= 2 ? { mode: 'pair', group: null, loose } : null;
+  }
+
+  /** Junta `moves` (sueltos) en el grupo `group` (o en uno nuevo) y gasta un vínculo. */
+  fuse(moves, group = null) {
+    const target = group || this.slots.find(s => s[0] === moves[0]);
+    const cur = this.slots[this.active];
+    for (const m of moves) {
+      if (target.includes(m)) continue;
+      const i = this.slots.findIndex(s => s.length === 1 && s[0] === m);
+      if (i < 0) continue;
+      this.slots.splice(i, 1);
+      target.push(m);
+    }
+    // Se pasa al grupo, salvo con la Cinta Elección (sigues en el hueco que tenías, si queda).
+    const a = this.slots.indexOf(cur);
+    this.active = this.hasItem('choiceband') && a >= 0 ? a : this.slots.indexOf(target);
+    this.bonds = Math.max(0, this.bonds - 1);
+    G.Projectiles.clearOrbs(this);
+    return target;
+  }
+
+  /** Movimientos que se lanzan ahora (el grupo del hueco activo). */
+  activeGroup() { return this.slots[this.active] || []; }
+
+  activeMove() { return this.activeGroup()[0]; }
 
   /**
    * Lo llama combat.js al lanzar un movimiento. Elige la animación de PMD y la
@@ -340,6 +381,7 @@ G.Player = class Player {
     // Movimiento activo (para el halo, el HUD y los orbes).
     if (n.mv && (!this.moves[0] || this.moves[0].id !== n.mv || this.moves[0].lvl !== n.ml) && G.Moves.BY_ID[n.mv]) {
       this.moves = [G.Moves.instance(n.mv, n.ml || 1)];
+      this.slots = [this.moves.slice()];
       this.active = 0;
       G.Projectiles.clearOrbs(this);
     }

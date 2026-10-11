@@ -112,7 +112,9 @@ G.Coop = (() => {
   const r1 = v => Math.round(v), r2 = v => Math.round(v * 100) / 100;
 
   function myState() {
-    const m = local.activeMove();
+    // Con un vínculo se manda la órbita si la hay (es lo único que los demás no ven por los 'c').
+    const g = local.activeGroup();
+    const m = g.find(x => x.kind === 'orbit') || g[0];
     return [r1(local.x), r1(local.y), r2(local.moveAngle), local.walking ? 1 : 0, r1(local.hp), r1(local.maxHp),
             local.dead ? 1 : 0, m ? m.id : '', m ? m.lvl : 1, r1(local.magnet), r2(local.aim), r2(local.xpMul),
             r2(local.reviveT || 0)];

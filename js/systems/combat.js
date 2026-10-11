@@ -19,9 +19,12 @@ G.Combat = (() => {
   // ---------------- ejecutar el movimiento activo ----------------
 
   function tick(dt, pl, now) {
-    const m = pl.activeMove();
-    if (!m || pl.dead) return;
+    if (pl.dead) return;
+    // Vínculos: todos los movimientos del hueco activo, cada uno con su recarga.
+    for (const m of pl.activeGroup()) tickMove(dt, pl, m, now);
+  }
 
+  function tickMove(dt, pl, m, now) {
     if (m.kind === 'orbit') { orbit(pl, m, dt, now); return; }
 
     m.t -= dt;
@@ -34,6 +37,9 @@ G.Combat = (() => {
     m.t = Math.max(0.05, m.cd * pl.cdMul);
     pl.cast(m);
     if (G.Coop.active) G.Coop.cast(pl, m);
+    // Vínculo: su icono destella en el HUD al lanzarse (uno que explota pegado al
+    // enemigo, como Ascuas tras Ataque Rápido, casi no se ve).
+    m.castAt = performance.now();
 
     run(pl, m);
   }
@@ -462,7 +468,8 @@ G.Combat = (() => {
   function orbit(pl, m, dt, now, isGhost = false) {
     const col = G.U.TYPE_COLOR[m.type];
     const want = Math.max(1, m.count | 0);
-    const mine = p => p.orb && p.owner === pl;
+    // Cada movimiento de órbita tiene sus orbes (puede haber dos en un vínculo).
+    const mine = p => p.orb && p.owner === pl && p.mid === m.id;
     const orbs = G.Projectiles.all().filter(mine);
     // Si cambia el número de orbes (al mejorar el movimiento), se reparten
     // todos por igual a partir de donde va el primero, sin saltos.
@@ -472,7 +479,7 @@ G.Combat = (() => {
 
     for (let i = orbs.length; i < want; i++) {
       G.Projectiles.spawnOrb({
-        owner: pl, ghost: isGhost,
+        owner: pl, ghost: isGhost, mid: m.id,
         x: pl.x, y: pl.y, r: m.size, color: col, vis: G.VFX.forMove(m),
         dmg: m.dmg * pl.atk,
         oa: (i / want) * 6.2832, orad: m.radius, ospeed: m.speed,

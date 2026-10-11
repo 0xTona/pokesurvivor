@@ -127,6 +127,70 @@ G.RunUI = (() => {
     G.UI.show('scr-item');
   }
 
+  // ---------------- vínculo: qué movimientos se fusionan ----------------
+
+  let bond = null;          // { opt, cb, first, list }
+
+  /**
+   * @param opt  pl.bondOptions(): 'add' (uno suelto al grupo) o 'pair' (dos sueltos, en dos pasos)
+   * @param cb   recibe la lista de movimientos que se juntan
+   */
+  function showBond(opt, cb) {
+    bond = { opt, cb, first: null, list: [] };
+    $('bond-back').onclick = bondBack;
+    renderBond();
+    G.UI.show('scr-bond');
+  }
+
+  function renderBond() {
+    const { opt, first } = bond;
+    const names = ms => ms.map(m => m.name).join(' + ');
+    const step2 = opt.mode === 'pair' && first;
+    $('bond-sub').textContent = opt.mode === 'add' ? 'Elige qué movimiento se une a ' + names(opt.group)
+      : step2 ? '¿Con cuál unes ' + first.name + '?' : 'Elige el primer movimiento que vas a unir';
+    $('bond-back').classList.toggle('hidden', !step2);
+    bond.list = step2 ? opt.loose.filter(m => m !== first) : opt.loose;
+    const box = $('bond-cards');
+    box.innerHTML = '';
+    bond.list.forEach((m, i) => {
+      const col = G.U.TYPE_COLOR[m.type];
+      const desc = opt.mode === 'add' ? 'Se lanzará a la vez que ' + names(opt.group) + '.'
+        : step2 ? 'Se lanzará a la vez que ' + first.name + '. Queda un hueco libre.'
+        : m.desc || '';
+      const el = document.createElement('div');
+      el.className = 'card' + (opt.mode === 'add' || step2 ? ' bond' : '');
+      el.innerHTML =
+        `<div class="ico" style="background:${col}33">${G.Icons.html('move:' + m.id, 32)}</div>
+         <div class="txt"><div class="nm">${m.name} <span class="tag-chip" style="background:${col}">Nv.${m.lvl}</span></div><div class="ds">${desc}</div></div>
+         <div class="key">${i + 1}</div>`;
+      el.dataset.sfx = 'none';
+      el.onclick = () => pickBond(i);
+      box.appendChild(el);
+    });
+  }
+
+  function pickBond(i) {
+    if (!bond || !bond.list[i]) return;
+    const m = bond.list[i];
+    if (bond.opt.mode === 'pair' && !bond.first) {
+      bond.first = m;
+      G.Audio.sfx('select');
+      renderBond();
+      return;
+    }
+    const picked = bond.opt.mode === 'add' ? [m] : [bond.first, m];
+    const cb = bond.cb;
+    bond = null;
+    G.UI.hide('scr-bond');
+    cb(picked);
+  }
+
+  function bondBack() {
+    if (!bond) return;
+    bond.first = null;
+    renderBond();
+  }
+
   function showPause(coop = false) {
     G.UI.soundControls($('pause-sound'));
     $('pause-coop').classList.toggle('hidden', !coop);
@@ -139,5 +203,5 @@ G.RunUI = (() => {
     $('btn-quit').onclick = onQuit;
   }
 
-  return { showLevelUp, showItemChoice, pick, setWaiting, closeLevelUp, showOver, wirePause, showPause };
+  return { showLevelUp, showItemChoice, showBond, pickBond, bondBack, pick, setWaiting, closeLevelUp, showOver, wirePause, showPause };
 })();

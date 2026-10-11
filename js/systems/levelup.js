@@ -1,6 +1,6 @@
 /* ============ levelup.js — las tres cartas de subida de nivel ============
  * Tipos de carta:
- *   new   aprender un movimiento nuevo (sólo si quedan huecos de los 4)
+ *   new   aprender un movimiento nuevo (sólo si quedan huecos de los 4; un vínculo libera huecos)
  *   up    mejorar un movimiento que ya tienes
  *   stat  mejora permanente de la run
  */
@@ -32,7 +32,7 @@ G.LevelUp = (() => {
     const out = [];
 
     // --- movimientos nuevos ---
-    if (pl.moves.length < pl.maxMoves) {
+    if (pl.slots.length < pl.maxMoves) {
       // Con 2 potenciadores ya no se ofrecen más: los buff no hacen daño y
       // llenar los 4 huecos con ellos deja la run sin salida.
       const buffs = pl.moves.filter(m => m.kind === 'buff').length;
@@ -89,7 +89,7 @@ G.LevelUp = (() => {
     for (const s of pickStats) {
       const evoFor = waiting[s.id];
       out.push({
-        w: evoFor ? 14 : pl.moves.length < pl.maxMoves ? 4 : 7,
+        w: evoFor ? 14 : pl.slots.length < pl.maxMoves ? 4 : 7,
         type: 'stat', key: 'stat:' + s.id,
         icon: s.icon, color: evoFor ? '#ffd23f' : '#8fa3c4', tag: evoFor ? 'Evoluciona ' + evoFor.name : 'Mejora',
         title: s.title, desc: s.desc,

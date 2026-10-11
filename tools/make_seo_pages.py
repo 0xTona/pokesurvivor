@@ -469,6 +469,9 @@ def ach_page(lang):
 
 # ================= novedades =================
 NEWS = [
+ ('2026-10-11', ('Vínculos: fusiona movimientos al vencer legendarios', 'Bonds: fuse moves by defeating legendaries'),
+  ('Cada legendario que vences en una grieta te da un vínculo: une dos movimientos para que se lancen a la vez y ocupen un solo hueco, y con cada legendario siguiente se suma otro, hasta 4 a la vez. Así queda sitio para aprender más movimientos. Además, las grietas salen más a menudo.',
+   'Every legendary you defeat in a rift gives you a bond: link two moves so they fire at the same time from a single slot, and each further legendary adds another one, up to 4 at once. That frees slots to learn more moves. Rifts also show up more often.')),
  ('2026-10-10', ('Jefes con varios ataques, 8 tipos de movimiento nuevos y más reto', 'Bosses with several attacks, 8 new move kinds and a tougher game'),
   ('Los jefes y legendarios tienen 4 ataques avisados, se acercan o pelean de lejos y se enfurecen a media vida. 12 movimientos nuevos y 8 formas de atacar: bumerán, cadena, minas, meteoros, torreta, embestida, rastro y abanico. Menos enemigos pero más duros, eventos a mitad de partida (hordas de un tipo, hora dorada, Pokémon perdidos), Meowth que huyen cargados de monedas, los de tipo Agua nadan sin frenarse y el ranking tiene anti-trampas.',
    'Bosses and legendaries have 4 telegraphed attacks, close in or fight from range and get enraged at half health. 12 new moves and 8 new ways to attack: boomerang, chain, mines, meteors, turret, dash, trail and spray. Fewer but tougher enemies, mid-run events (single-type hordes, golden hour, lost Pokémon), Meowth running away loaded with coins, Water types swim at full speed and the leaderboard has anti-cheat.')),

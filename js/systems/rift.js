@@ -4,8 +4,9 @@
  * jugador. Dura GRIETA_TTL segundos; si entras, te lleva (con todo el grupo)
  * a una arena cerrada en el Mundo Distorsión, contra un Pokémon LEGENDARIO.
  *
- *   ganas    el legendario suelta tickets ×10 y más; a los pocos segundos
- *            volvéis al mapa donde estabais
+ *   ganas    el legendario suelta tickets ×10 y más, y cada uno se lleva un
+ *            VÍNCULO (fusiona movimientos, ver Player.fuse); a los pocos
+ *            segundos volvéis al mapa donde estabais y se elige la fusión
  *   pierdes  (caéis todos o se acaba el tiempo) volvéis sin premio, con algo
  *            de vida; la partida sigue
  *
@@ -17,7 +18,8 @@
  *   y del invitado al anfitrión 're' (he entrado en la grieta).
  */
 G.Rift = (() => {
-  const CHECK = 30, CHANCE = 0.14, TTL = 45;
+  // (0.14 hasta el 11-10-2026: más grietas para que se vean los vínculos)
+  const CHECK = 30, CHANCE = 0.2, TTL = 45;
   const ARENA_R = 11, ARENA_TIME = 120, FROM = 75;
   let rift = null;          // { x, y, ttl, t }
   let arena = null;         // { tx, ty, r, dex, shiny, x, y, back, biome, t, phase, endT, bossId }
@@ -182,6 +184,12 @@ G.Rift = (() => {
     G.Pickups.pullAll();
     G.Spawner.say('¡Has vencido a ' + G.DEX_BY[arena.dex].name + '! Recoge el premio…', 3.4, true);
     G.Audio.sfx('legend');
+    const pl = G.Game.player;
+    if (pl) {
+      pl.bonds++;
+      G.FX.dmgText(pl.x, pl.y - pl.bodyH - 10, '¡Vínculo!', '#ff8ad8', true);
+      G.FX.ring(pl.x, pl.y, 8, 90, '#ff8ad8', 0.7, 5);
+    }
   }
 
   function lost() {
@@ -207,6 +215,7 @@ G.Rift = (() => {
     if (pl.dead) pl.revive(0.3);
     G.Camera.x = pl.x; G.Camera.y = pl.y;
     G.Game.flash('#c9a6ff', 0.8);
+    if (pl.bonds > 0) G.Game.offerBond();
   }
 
   // ---------------- dibujo ----------------

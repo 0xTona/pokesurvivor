@@ -293,6 +293,36 @@ G.Game = (() => {
     });
   }
 
+  // ---------------- vínculos ----------------
+
+  /**
+   * Vínculo de un legendario: eliges qué movimientos se fusionan.
+   * Si ahora no se puede (no hay dos sueltos), se guarda hasta que aprendas
+   * otro movimiento. Se mira en cada fotograma: si otra pantalla la tapa (cartas
+   * de nivel en grupo, pausa), vuelve a salir al cerrarla.
+   * @param quiet  no avisar si todavía no se puede
+   */
+  function offerBond(quiet = false) {
+    if (!pl || pl.bonds <= 0 || pl.dead || state !== 'playing' || G.Rift.inArena) return;
+    if (['scr-bond', 'scr-pause', 'scr-item', 'scr-levelup'].some(G.UI.isOpen)) return;
+    const opt = pl.bondOptions();
+    if (!opt) {
+      if (!quiet) G.Spawner.say('Guardas el vínculo: aprende otro movimiento para usarlo', 3, true);
+      return;
+    }
+    // En solitario se para el juego; en grupo sigue (como con los objetos).
+    if (!G.Coop.active) state = 'choice';
+    G.Audio.sfx('levelup');
+    G.RunUI.showBond(opt, picked => {
+      const group = pl.fuse(picked, opt.group);
+      G.Audio.sfx('legend');
+      G.FX.ring(pl.x, pl.y, 8, 130, '#ff8ad8', 0.8, 6);
+      G.FX.burst(pl.x, pl.y - pl.bodyH * 0.5, '#ffb3e6', 40, 240);
+      G.Spawner.say('¡Vínculo! ' + group.length + ' movimientos a la vez', 2.6, true);
+      if (state === 'choice') state = 'playing';
+    });
+  }
+
   // ---------------- recogida ----------------
 
   const PICK_SFX = { xp: 'xp', xpBig: 'xp', coin: 'coin', heal: 'heal', bomb: 'break', magnet: 'confirm', ticket: 'shiny', ticket10: 'legend', item: 'legend' };
@@ -372,6 +402,12 @@ G.Game = (() => {
     if (state === 'levelup') {
       for (let i = 0; i < 3; i++) {
         if (G.Input.tap('digit' + (i + 1)) || G.Input.tap('numpad' + (i + 1))) G.RunUI.pick(i);
+      }
+      return;
+    }
+    if (G.UI.isOpen('scr-bond')) {
+      for (let i = 0; i < 4; i++) {
+        if (G.Input.tap('digit' + (i + 1)) || G.Input.tap('numpad' + (i + 1))) G.RunUI.pickBond(i);
       }
       return;
     }
@@ -491,6 +527,7 @@ G.Game = (() => {
 
     G.Audio.music(G.Rift.inArena ? 'rift' : G.EnemyMgr.bossAlive() ? 'boss' : G.BIOME_MUSIC[biome % G.BIOME_MUSIC.length]);
     if (!coop || G.Coop.isHost) maybeLevelUp();
+    if (pl.bonds > 0) offerBond(true);
     if (G.Coop.isHost) checkAllDown(dt);
   }
 
@@ -677,7 +714,7 @@ G.Game = (() => {
   })();
 
   return {
-    init, startRun, everyone, levelXp, flash,
+    init, startRun, everyone, levelXp, flash, offerBond,
     /** Para pruebas: salta el reloj de la run. */
     debugTime(t) { G.Guard.flag('debug'); time = t; },
     /** Para grabar vídeos: cámara lenta (0,5 = mitad de velocidad). */

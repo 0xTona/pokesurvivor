@@ -239,13 +239,17 @@ G.HUD = (() => {
 
     // ---------- ranura de movimientos ----------
     const S = 54, GAP = 9;
-    const n = Math.max(1, pl.moves.length);
+    const n = Math.max(1, pl.slots.length);
     const totalW = n * S + (n - 1) * GAP;
     let sx = (w - totalW) / 2;
     const sy = h - S - 18;
+    const BOND = '#ff8ad8';
+    const cdOf = m => m.kind === 'orbit' ? 0 : G.U.clamp(m.t / (m.cd * pl.cdMul), 0, 1);
 
     for (let i = 0; i < n; i++) {
-      const m = pl.moves[i];
+      const g = pl.slots[i] || [];
+      const m = g[0];
+      const fused = g.length > 1;
       const on = i === pl.active;
       const x = sx + i * (S + GAP);
       const y = on ? sy - 6 : sy;
@@ -257,47 +261,74 @@ G.HUD = (() => {
       roundRect(ctx, x, y, S, S, 12);
       ctx.fillStyle = on ? 'rgba(20,30,50,.95)' : 'rgba(10,16,28,.8)';
       ctx.fill();
-      ctx.lineWidth = on ? 2.5 : m && m.evolved ? 2 : 1.2;
-      // Evolucionado: borde dorado.
-      ctx.strokeStyle = m && m.evolved ? '#ffd23f' : on ? col : 'rgba(140,170,210,.22)';
+      ctx.lineWidth = on ? 2.5 : fused || (m && m.evolved) ? 2 : 1.2;
+      // Vínculo: borde rosa. Evolucionado: dorado.
+      ctx.strokeStyle = fused ? BOND : m && m.evolved ? '#ffd23f' : on ? col : 'rgba(140,170,210,.22)';
       ctx.stroke();
 
       if (!m) continue;
 
-      // recarga: se vacía de abajo a arriba
-      const cdFrac = m.kind === 'orbit' ? 0 : G.U.clamp(m.t / (m.cd * pl.cdMul), 0, 1);
-      if (cdFrac > 0) {
-        ctx.save();
-        roundRect(ctx, x, y, S, S, 12); ctx.clip();
-        ctx.fillStyle = 'rgba(0,0,0,.6)';
-        ctx.fillRect(x, y, S, S * cdFrac);
-        ctx.restore();
-      }
+      if (fused) {
+        // Vínculo: los movimientos en una cuadrícula de 2×2, cada uno con su recarga.
+        const C = 22, P = (S - C * 2) / 3;
+        g.forEach((gm, k) => {
+          const cx = x + P + (k % 2) * (C + P), cy = y + P + Math.floor(k / 2) * (C + P);
+          G.Icons.draw(ctx, 'move:' + gm.id, cx, cy, C);
+          const f = cdOf(gm);
+          if (f > 0) { ctx.fillStyle = 'rgba(0,0,0,.55)'; ctx.fillRect(cx, cy, C, C * f); }
+          if (gm.evolved) { ctx.strokeStyle = '#ffd23f'; ctx.lineWidth = 1; ctx.strokeRect(cx + 0.5, cy + 0.5, C - 1, C - 1); }
+          // Destello al lanzarse.
+          const fl = 1 - (performance.now() - (gm.castAt || 0)) / 180;
+          if (fl > 0) { ctx.fillStyle = 'rgba(255,255,255,' + (fl * 0.55).toFixed(2) + ')'; ctx.fillRect(cx, cy, C, C); }
+        });
+      } else {
+        // recarga: se vacía de abajo a arriba
+        const cdFrac = cdOf(m);
+        if (cdFrac > 0) {
+          ctx.save();
+          roundRect(ctx, x, y, S, S, 12); ctx.clip();
+          ctx.fillStyle = 'rgba(0,0,0,.6)';
+          ctx.fillRect(x, y, S, S * cdFrac);
+          ctx.restore();
+        }
 
-      // emblema del tipo + insignia de la familia
-      G.Icons.draw(ctx, 'move:' + m.id, x + (S - 32) / 2, y + (S - 32) / 2 - 2, 32);
+        // emblema del tipo + insignia de la familia
+        G.Icons.draw(ctx, 'move:' + m.id, x + (S - 32) / 2, y + (S - 32) / 2 - 2, 32);
+
+        // nivel del movimiento (puntitos)
+        const dots = m.def.maxLvl;
+        const dw = 4, dgap = 2;
+        const tw = dots * dw + (dots - 1) * dgap;
+        for (let d = 0; d < dots; d++) {
+          ctx.fillStyle = d < m.lvl ? col : 'rgba(255,255,255,.18)';
+          ctx.fillRect(x + (S - tw) / 2 + d * (dw + dgap), y + S - 9, dw, 3);
+        }
+      }
 
       // tecla
       ctx.font = F(800, 9);
-      ctx.fillStyle = on ? col : 'rgba(180,200,230,.6)';
+      ctx.fillStyle = fused ? BOND : on ? col : 'rgba(180,200,230,.6)';
       ctx.textAlign = 'left';
-      ctx.fillText(String(i + 1), x + 6, y + 13);
+      ctx.fillText(String(i + 1), x + 3, y + 10);
 
-      // nivel del movimiento (puntitos)
-      const dots = m.def.maxLvl;
-      const dw = 4, dgap = 2;
-      const tw = dots * dw + (dots - 1) * dgap;
-      for (let d = 0; d < dots; d++) {
-        ctx.fillStyle = d < m.lvl ? col : 'rgba(255,255,255,.18)';
-        ctx.fillRect(x + (S - tw) / 2 + d * (dw + dgap), y + S - 9, dw, 3);
-      }
-
-      // nombre debajo del activo
+      // nombre encima del activo (con un vínculo: "Ascuas +2")
       if (on) {
         ctx.font = F(700, 10);
         ctx.textAlign = 'center';
-        ctx.fillStyle = col;
-        ctx.fillText(m.name, x + S / 2, y - 7);
+        ctx.fillStyle = fused ? BOND : col;
+        ctx.fillText(fused ? m.name + ' +' + (g.length - 1) : m.name, x + S / 2, y - 7);
+      }
+    }
+
+    // ---------- vínculo guardado (aún no hay dos movimientos sueltos) ----------
+    if (pl.bonds > 0) {
+      const bx = sx + totalW + 12, by = sy + S / 2 - 12;
+      G.Icons.draw(ctx, 'bond', bx, by, 24);
+      if (pl.bonds > 1) {
+        ctx.font = F(800, 10);
+        ctx.textAlign = 'left';
+        ctx.fillStyle = BOND;
+        ctx.fillText('×' + pl.bonds, bx + 25, by + 20);
       }
     }
 

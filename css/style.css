@@ -611,6 +611,15 @@ a.plink:hover { color: var(--gold); }
 .ach-pop small { color: var(--muted); }
 .card.evo { border-color: var(--gold); background: linear-gradient(90deg, rgba(255,210,63,.18), rgba(255,210,63,.04)); }
 .card.evo .nm { color: var(--gold); }
+/* Vínculo (premio de los legendarios): rosa */
+.bond-title { color: #ff8ad8; }
+.card.bond { border-color: #ff8ad8; background: linear-gradient(90deg, rgba(255,138,216,.18), rgba(255,138,216,.04)); }
+.card.bond .nm { color: #ff8ad8; }
+@media (max-height: 520px) {
+  #scr-bond .bond-hint { display: none; }
+  #scr-bond .box { width: min(820px, 100%); }
+  #bond-cards { display: grid; grid-template-columns: 1fr 1fr; width: 100%; }
+}
 @media (max-width: 760px) { .mission { grid-template-columns: 1fr; } .prof-marks { grid-template-columns: repeat(2, 1fr); } }
 
 
