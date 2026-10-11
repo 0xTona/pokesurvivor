@@ -410,6 +410,7 @@ G.I18n.add({
   'Guardado en la nube': 'Saved in the cloud', 'Guardando…': 'Saving…', 'Pendiente de subir (se sube al salir del juego)': 'Waiting to upload (uploads when you leave the game)',
   'Sin conexión: se subirá al volver': 'Offline: it will upload when you\'re back', 'Guardado sólo en este navegador': 'Saved only in this browser', 'Invitado: no se guarda': 'Guest: not saved',
   'Se borrarán tu cuenta y toda tu partida, para siempre. ¿Seguro?': 'Your account and all your progress will be deleted forever. Are you sure?',
+  'Cambiar opciones (': 'Reroll (',
   'Cuenta borrada': 'Account deleted', 'Borrar para siempre': 'Delete forever',
   'Se borrarán tu cuenta y toda tu partida, para siempre. Para confirmarlo, escribe tu contraseña.': 'Your account and all your progress will be deleted forever. To confirm, type your password.',
   'Escribe tu contraseña.': 'Type your password.', 'Inicia sesión para poder borrar tu cuenta.': 'Log in to be able to delete your account.',

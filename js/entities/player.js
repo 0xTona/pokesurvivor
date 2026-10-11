@@ -49,6 +49,7 @@ G.Player = class Player {
     this.xpNext = Player.xpFor(1);
     this.kills = 0;
     this.bosses = 0;
+    this.rerolls = 0;          // veces que ha cambiado las cartas de nivel (1 gratis + 1 por jefe)
     this.coins = 0;            // monedas recogidas en esta run
     this.t1 = 0; this.t10 = 0; // tickets del gacha recogidos en esta run
     this.dmgDealt = 0;

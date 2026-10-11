@@ -421,6 +421,7 @@ G.Game = (() => {
       for (let i = 0; i < 3; i++) {
         if (G.Input.tap('digit' + (i + 1)) || G.Input.tap('numpad' + (i + 1))) G.RunUI.pick(i);
       }
+      if (G.Input.tap('keyr')) G.RunUI.reroll();
       return;
     }
     if (G.UI.isOpen('scr-bond')) {

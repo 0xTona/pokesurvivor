@@ -209,17 +209,18 @@
       cd: 0.95, dmg: 21, count: 4, radius: 140 },
 
     // ---------------- PSÍQUICO ----------------
+    // (11-10-2026: -22/-30 % de daño y persiguen menos; llenaban el ranking.)
     { id: 'confusion', name: 'Confusión', type: 'psychic', kind: 'projectile',
       desc: 'Onda que persigue sola a su objetivo.',
-      cd: 0.58, dmg: 19, speed: 280, count: 1, spread: 0.1, pierce: 0, life: 2.2, size: 8, homing: 3.2 },
+      cd: 0.58, dmg: 13, speed: 280, count: 1, spread: 0.1, pierce: 0, life: 2.2, size: 8, homing: 2.0 },
 
     { id: 'psybeam', name: 'Psicorrayo', type: 'psychic', kind: 'beam',
       desc: 'Rayo psíquico ancho y contundente.',
-      cd: 1.15, dmg: 22, radius: 215, width: 40 },
+      cd: 1.15, dmg: 17, radius: 215, width: 40 },
 
     { id: 'psychic', name: 'Psíquico', type: 'psychic', kind: 'nova',
       desc: 'Estallido mental radial que busca enemigos.',
-      cd: 1.35, dmg: 14, speed: 230, count: 12, pierce: 1, life: 1.6, size: 7, homing: 1.6 },
+      cd: 1.35, dmg: 10, speed: 230, count: 12, pierce: 1, life: 1.6, size: 7, homing: 1.0 },
 
     // ---------------- TIPOS SECUNDARIOS ----------------
     { id: 'sludge', name: 'Residuos', type: 'poison', kind: 'projectile',
@@ -357,7 +358,7 @@
 
     { id: 'psycho-cut', name: 'Psicocorte', type: 'psychic', kind: 'boomerang',
       desc: 'Cuchillas psíquicas que vuelven a ti.',
-      cd: 0.8, dmg: 12, speed: 360, count: 2, spread: 0.6, radius: 200, size: 7 },
+      cd: 0.8, dmg: 9, speed: 360, count: 2, spread: 0.6, radius: 200, size: 7 },
 
     { id: 'spikes', name: 'Púas', type: 'ground', kind: 'mine',
       desc: 'Siembra púas que estallan al pisarlas.',
