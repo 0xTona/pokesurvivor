@@ -33,7 +33,9 @@ G.Ranking = (() => {
   const TZ = 'Europe/Madrid';
   const PERIODS = [['d', 'Diario'], ['w', 'Semanal'], ['m', 'Mensual'], ['a', 'Histórico']];
   // Periodos en los que sólo se guarda el top 50 (ver arriba).
-  const TOP_ONLY = new Set(['d', 'w', 'm']);
+  // ('p' = histórico de un Pokémon: casi cada partida entraba en el de su
+  //  Pokémon y escribía; ahora también sólo el top 50.)
+  const TOP_ONLY = new Set(['d', 'w', 'm', 'p']);
   const TOP = 50;
   const TTL = 30 * 60 * 1000;            // caché de lo leído (30 min: menos lecturas de Firestore)
 
@@ -177,7 +179,7 @@ G.Ranking = (() => {
         known[key] = entry.t;
         if (b.startsWith('g_')) known[b + ':*'] = Math.max(known[b + ':*'] || 0, entry.t);
         mem.delete('r:' + b); try { localStorage.removeItem('ps.rk.c.r:' + b); } catch (e) { /* nada */ }
-        if (period && !better.includes(period)) better.push(period);
+        if (period && period !== 'p' && !better.includes(period)) better.push(period);
       } catch (e) { console.warn('[Ranking] no se pudo guardar en', b, e.code || e.message); }
     }));
     saveBests(known);
@@ -197,7 +199,7 @@ G.Ranking = (() => {
     const ids = periodIds();
     const entry = { t: r.t, uids: [fb.uid], names: [G.Social.me.name], dex: [r.dex], shiny: [!!r.shiny], lv: r.lv, kills: r.kills };
     const boards = PERIODS.map(([p]) => ['s_' + ids[p], p]);
-    boards.push(['s_all_p' + r.dex, null]);
+    boards.push(['s_all_p' + r.dex, 'p']);
     const better = await store(boards, fb.uid, entry);
     announce(better);
     return better;
@@ -213,7 +215,7 @@ G.Ranking = (() => {
                     shiny: ms.map(m => !!m.shiny), lv: r.lv, kills: r.kills };
     const ids = periodIds();
     const boards = PERIODS.map(([p]) => ['g_' + ids[p], p]);
-    for (const d of new Set(entry.dex)) boards.push(['g_all_p' + d, null]);
+    for (const d of new Set(entry.dex)) boards.push(['g_all_p' + d, 'p']);
     const better = await store(boards, id, entry);
     announce(better);
     return better;
@@ -248,8 +250,8 @@ G.Ranking = (() => {
     if (!friendsOnly) return rows.slice(0, TOP);
     const circle = [fb.uid, ...G.Social.friends.filter(f => f.status === 'ok').map(f => f.uid)].slice(0, 30);
     const inTop = rows.filter(r => r.uids.some(u => circle.includes(u)));
-    // En diario, semanal y mensual no hay marcas fuera del top 50: no hay nada más que buscar.
-    if (TOP_ONLY.has(period)) return inTop;
+    // En diario, semanal, mensual y por Pokémon no hay marcas fuera del top 50.
+    if (TOP_ONLY.has(period) || dex) return inTop;
     // Los amigos que no están en el top 50: se buscan aparte (y se guardan 30 min).
     const ck = 'f:' + b + ':' + circle.slice().sort().join(',');
     let extra = cacheGet(ck);
@@ -278,7 +280,7 @@ G.Ranking = (() => {
     const rows = sorted(await summary(b));
     const i = rows.findIndex(r => r.uids.includes(fb.uid));
     if (i >= 0) return { pos: i + 1, t: rows[i].t, row: rows[i] };
-    if (TOP_ONLY.has(period)) return { out: true };
+    if (TOP_ONLY.has(period) || dex) return { out: true };
     const ck = 'r:' + b;
     const c = cacheGet(ck);
     if (c !== undefined) return c;

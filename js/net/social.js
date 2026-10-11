@@ -445,9 +445,15 @@ G.Social = (() => {
     pubT = setTimeout(() => {
       if (!me || !fb) return;
       const d = profileData();
-      const key = JSON.stringify(d);
+      // Para decidir si se sube: los derrotados cuentan por miles (cambian en
+      // cada partida y reescribir el perfil cada vez gastaba miles de
+      // escrituras por hora). Se recuerda entre sesiones.
+      const key = JSON.stringify(Object.assign({}, d, { best: Object.assign({}, d.best, { kills: Math.floor(d.best.kills / 1000) }) }));
+      const lsKey = 'ps.pub.' + uid;
+      if (!pubLast) { try { pubLast = localStorage.getItem(lsKey) || ''; } catch (e) { /* nada */ } }
       if (key === pubLast) return;
       pubLast = key; pubAt = Date.now();
+      try { localStorage.setItem(lsKey, key); } catch (e) { /* nada */ }
       fb.fs.collection('profiles').doc(uid).set(Object.assign(d, {
         name: me.name, lower: me.name.toLowerCase(), at: firebase.firestore.FieldValue.serverTimestamp()
       })).catch(e => { pubLast = ''; console.warn('[Social] perfil:', e.code || e.message); });

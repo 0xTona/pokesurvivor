@@ -246,11 +246,11 @@ G.DB = (() => {
 
   let auth = null, fs = null, rtdb = null, uid = null, unlisten = null;
   let pushT = 0, retryT = 0, pending = false, pushing = null, lastPush = 0;
-  // Como mucho una subida cada 5 min (el plan gratuito de Firebase tiene un
-  // cupo diario de escrituras); lo que cuesta algo (gacha, mejoras), a los
-  // 30 s. La copia local se guarda siempre al momento (y se fusiona con la
+  // Como mucho una subida cada 30 min (con miles de jugadores, cada 5 min
+  // eran decenas de miles de escrituras por hora); lo que cuesta algo
+  // (gacha, mejoras), a los 30 s. La copia local se guarda siempre al momento (y se fusiona con la
   // nube al volver a entrar), y al ocultar o cerrar la pestaña se sube lo pendiente.
-  const PUSH_GAP = 5 * 60 * 1000, PUSH_GAP_URGENT = 30 * 1000;
+  const PUSH_GAP = 30 * 60 * 1000, PUSH_GAP_URGENT = 30 * 1000;
   let syncState = 'local';           // 'ok' | 'syncing' | 'pending' | 'offline' | 'local'
   const listeners = new Set();
 
