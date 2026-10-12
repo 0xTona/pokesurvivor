@@ -12,8 +12,12 @@ G.CHANGELOG = [
     ['Números más fáciles de leer: el 2, el 5 y el 8 ya no se confunden.',
      'Easier to read numbers: 2, 5 and 8 no longer look alike.'],
     ['Elige la versión normal o shiny de tu compañero desde el menú principal, debajo de él.',
-     'Pick the normal or shiny version of your partner right from the main menu, under it.']
+     'Pick the normal or shiny version of your partner right from the main menu, under it.'],
+    ['Mejoras nuevas para cada Pokémon: Golpe Crítico (+3 % de críticos por nivel, que hacen x1,5 de daño), Cambio de cartas (+1 cambio de las cartas de nivel por run) y Veto (bloquea movimientos para que no te salgan en las cartas; se eligen en Mejoras).',
+     'New upgrades for each Pokémon: Critical Hit (+3% critical chance per level, crits deal x1.5 damage), Card reroll (+1 level-up card reroll per run) and Ban (block moves so they never show up in your cards; pick them in Upgrades).']
   ], chg: [
+    ['Los cambios de cartas de nivel ya no se ganan venciendo jefes: tienes 1 gratis por run y el resto se compra en Mejoras.',
+     'Level-up card rerolls are no longer earned by defeating bosses: you get 1 free per run and can buy more in Upgrades.'],
     ['Los legendarios de grieta ya no dan siempre tickets x10: dan uno la mitad de las veces (antes daban 2 siempre y salían demasiados).',
      'Rift legendaries no longer always drop x10 tickets: they drop one half of the time (they used to always drop 2, which was too many).'],
     ['Gacha: los shiny ya no salen repetidos. Si te toca uno que ya tienes, sale otro de la misma rareza que te falte.',

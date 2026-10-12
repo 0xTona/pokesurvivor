@@ -117,6 +117,13 @@ G.DB = (() => {
     if (G.DEX_BY) for (const coll of ['owned', 'shiny']) {
       for (const d of Object.keys(s[coll] || {})) if (!G.DEX_BY[d]) delete s[coll][d];
     }
+    // Veto: listas de movimientos que existen, sin repetir, como mucho 3.
+    if (s.pban && typeof s.pban === 'object') {
+      for (const d of Object.keys(s.pban)) {
+        const l = Array.isArray(s.pban[d]) ? s.pban[d] : [];
+        s.pban[d] = [...new Set(l.filter(id => typeof id === 'string' && (!G.Moves || G.Moves.BY_ID[id])))].slice(0, 3);
+      }
+    } else s.pban = {};
     if (G.Upgrades) for (const d of Object.keys(s.pupg || {})) {
       const u = s.pupg[d];
       if (!u || typeof u !== 'object') { delete s.pupg[d]; continue; }

@@ -751,6 +751,12 @@ a.btn { text-decoration: none; display: inline-block; color: var(--ink); }
 /* ---------- apoyar el proyecto ---------- */
 #scr-support { z-index: 60; }
 .box.support { width: min(560px, 100%); }
+/* Mejoras: botones y veto */
+.upg-btns { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; justify-content: flex-end; }
+.ban-picker { grid-column: 1 / -1; }
+.ban-moves { display: flex; flex-wrap: wrap; gap: 6px; }
+.ban-moves .chip { display: inline-flex; align-items: center; gap: 5px; }
+.ban-moves .chip.ban { background: rgba(255,95,109,.25); border-color: #ff5f6d; color: #ffd3d8; text-decoration: line-through; }
 /* Novedades */
 .news-btn { position: relative; }
 .news-btn .dot { display: none; position: absolute; top: 3px; right: 3px; width: 8px; height: 8px; background: #ff5f6d; box-shadow: 0 0 0 2px var(--shadow); }

@@ -21,7 +21,8 @@ G.RunUI = (() => {
    */
   function rerollsLeft() {
     const p = G.Game.player;
-    return p ? Math.max(0, 1 + (p.bosses || 0) - (p.rerolls || 0)) : 0;
+    // 1 gratis + los comprados en Mejoras (antes, 1 más por cada jefe).
+    return p ? Math.max(0, 1 + (p.rerollBonus || 0) - (p.rerolls || 0)) : 0;
   }
 
   function reroll() {

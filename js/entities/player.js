@@ -49,7 +49,10 @@ G.Player = class Player {
     this.xpNext = Player.xpFor(1);
     this.kills = 0;
     this.bosses = 0;
-    this.rerolls = 0;          // veces que ha cambiado las cartas de nivel (1 gratis + 1 por jefe)
+    this.rerolls = 0;          // veces que ha cambiado las cartas de nivel en esta run
+    this.rerollBonus = perks.rerolls || 0;   // cambios comprados en Mejoras (más el gratis)
+    this.critChance = perks.crit || 0;       // probabilidad de golpe crítico (Mejoras)
+    this.banned = new Set();                 // movimientos vetados (Mejoras → Veto): no salen en las cartas
     this.coins = 0;            // monedas recogidas en esta run
     this.t1 = 0; this.t10 = 0; // tickets del gacha recogidos en esta run
     this.dmgDealt = 0;
