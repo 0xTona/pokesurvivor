@@ -303,7 +303,10 @@ G.DB = (() => {
   // eran decenas de miles de escrituras por hora); lo que cuesta algo
   // (gacha, mejoras), a los 30 s. La copia local se guarda siempre al momento (y se fusiona con la
   // nube al volver a entrar), y al ocultar o cerrar la pestaña se sube lo pendiente.
-  const PUSH_GAP = 30 * 60 * 1000, PUSH_GAP_URGENT = 30 * 1000, HIDE_GAP = 10 * 60 * 1000;
+  // Tras tiradas y compras se sube a los 3 min (era 30 s: quien hacía muchas tiradas
+  // guardaba 2 veces por minuto y eran millones de escrituras al día). Lo hecho sigue
+  // en la copia del navegador al momento, y se sube al salir de la pestaña.
+  const PUSH_GAP = 30 * 60 * 1000, PUSH_GAP_URGENT = 3 * 60 * 1000, HIDE_GAP = 10 * 60 * 1000;
   let syncState = 'local';           // 'ok' | 'syncing' | 'pending' | 'offline' | 'local'
   const listeners = new Set();
 
