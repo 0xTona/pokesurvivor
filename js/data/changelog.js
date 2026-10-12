@@ -14,6 +14,8 @@ G.CHANGELOG = [
     ['Elige la versión normal o shiny de tu compañero desde el menú principal, debajo de él.',
      'Pick the normal or shiny version of your partner right from the main menu, under it.']
   ], chg: [
+    ['Gacha: los shiny ya no salen repetidos. Si te toca uno que ya tienes, sale otro de la misma rareza que te falte.',
+     'Gacha: shinies no longer come out as duplicates. If you roll one you already have, you get another of the same rarity that you are missing.'],
     ['Grietas con menos azar: cada vez que no sale una, la siguiente es más probable (como mucho 2,5 minutos sin grieta).',
      'Less random rifts: every time one does not show up, the next one is more likely (at most 2.5 minutes without a rift).'],
     ['Los legendarios que aún no has vencido salen 4 veces más en las grietas.',
