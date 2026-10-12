@@ -26,8 +26,12 @@ G.NewsUI = (() => {
   function open() {
     const en = G.I18n.lang === 'en' ? 1 : 0;
     // Cada texto ya va en su idioma: translate="no" para que no lo toque i18n.
+    const PARTS = [['new', ['Nuevo', 'New']], ['chg', ['Cambios', 'Changes']], ['fix', ['Arreglos', 'Fixes']]];
     $('news-body').innerHTML = G.CHANGELOG.map(v =>
-      `<div class="news-day" translate="no"><h3>${fmt(v.d)}</h3><ul>${v.items.map(t => `<li>${esc(t[en])}</li>`).join('')}</ul></div>`).join('');
+      `<div class="news-day" translate="no"><h3>${esc(v.title ? v.title[en] : '')}<small>${fmt(v.d)}</small></h3>` +
+      PARTS.filter(([k]) => v[k] && v[k].length).map(([k, lbl]) =>
+        `<div class="news-part"><span class="news-tag ${k}">${lbl[en]}</span><ul>${v[k].map(t => `<li>${esc(t[en])}</li>`).join('')}</ul></div>`).join('') +
+      '</div>').join('');
     $('news-body').scrollTop = 0;
     $('scr-news').classList.remove('hidden');
     try { localStorage.setItem(KEY, latest()); } catch (e) { /* nada */ }

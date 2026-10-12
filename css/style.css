@@ -750,7 +750,13 @@ a.btn { text-decoration: none; display: inline-block; color: var(--ink); }
 .news-btn.new .dot { display: block; }
 .box.news-box { width: min(640px, 100%); max-height: calc(100dvh - 90px); display: flex; flex-direction: column; }
 .news-body { overflow-y: auto; padding-right: 4px; }
-.news-day h3 { color: var(--gold); margin: 12px 0 4px; font-size: 17px; }
+.news-day { padding-bottom: 6px; border-bottom: 1px solid rgba(255,255,255,.1); }
+.news-day:last-child { border-bottom: 0; }
+.news-day h3 { color: var(--gold); margin: 14px 0 6px; font-size: 18px; }
+.news-day h3 small { display: block; color: var(--muted); font-size: 13px; font-weight: 400; margin-top: 2px; }
+.news-part { margin: 6px 0 8px; }
+.news-tag { display: inline-block; font-size: 12px; font-weight: 700; padding: 1px 8px; border-radius: 4px; color: #0b1020; text-shadow: none; }
+.news-tag.new { background: #5fe08a; } .news-tag.chg { background: #4fb4ff; } .news-tag.fix { background: #ffb347; }
 .news-day ul { margin: 0; padding-left: 20px; }
 .news-day li { margin: 4px 0; line-height: 1.35; font-size: 15px; }
 @media (max-width: 760px) { .news-btn span { display: none; } }
