@@ -5,7 +5,8 @@
  *
  *   reloj       el tiempo de juego no puede ir más deprisa que el real
  *   vida        vida por encima del máximo, o un máximo imposible
- *   velocidad / ataque / nivel   valores que no se pueden alcanzar jugando
+ *   velocidad / ataque / nivel / experiencia / recarga / imán
+ *               valores que no se pueden alcanzar jugando
  *   derrotados / monedas         subidas imposibles de un segundo a otro
  *   debug       se han usado las herramientas de pruebas o de vídeo
  *
@@ -45,6 +46,14 @@ G.Guard = (() => {
     if (!isFinite(p.hp) || p.hp > p.maxHp + 1 || p.maxHp > 400 + 20 * p.level) flag('vida');
     if (p.spdMul > 5 || p.baseSpd > 200 || buff(p.buffs.spd) > 4) flag('velocidad');
     if (p.atkMul > 200 || p.baseAtk > 2 || buff(p.buffs.atk) > 4) flag('ataque');
+    //   experiencia  1,4 tienda × 1,12^8 cartas × 1,3 Huevo Suerte ≈ 4,5
+    //   recarga      0,76 tienda × 0,92^10 cartas × 0,8 objeto × 0,6 altar ≈ 0,16
+    //   imán         78 × 1,72 tienda × 1,3^6 cartas × 4 altar ≈ 2.600
+    //   monedas      1,64 tienda × 1,5 Moneda Amuleto ≈ 2,5
+    if (p.xpMul > 5) flag('experiencia');
+    if (p.cdMul < 0.14) flag('recarga');
+    if (p.magnet > 3000) flag('imán');
+    if (p.coinMul > 3) flag('monedas');
     if (p.level > 10 + time / 4) flag('nivel');
     // En grupo los derrotados y las monedas los reparte el anfitrión: sólo en solitario.
     if (run.prev && !run.coop) {

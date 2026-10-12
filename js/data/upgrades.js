@@ -24,7 +24,8 @@ G.Upgrades = (() => {
 
   /** Niveles comprados -> modificadores para G.Player. */
   function perks(levels = {}) {
-    const L = id => levels[id] || 0;
+    // Nunca por encima del máximo (una partida editada a mano no da más poder).
+    const L = id => Math.max(0, Math.min(BY[id].max, Math.floor(+levels[id] || 0)));
     return {
       hp: L('hp') * 8,
       atkMul: 1 + L('atk') * 0.04,
