@@ -220,8 +220,8 @@ G.Game = (() => {
       if (holdBy.length) {
         if (state === 'playing') state = 'held';
         if (pl && pl.bonds > 0) offerBond(true);      // si tú también tienes vínculo, eliges a la vez
-        const others = mine ? holdBy.filter(n => n !== (G.Social.me && G.Social.me.name)) : holdBy;
-        if (!mine && others.length) G.Spawner.say('Pausa: ' + others.join(', ') + ' ' + (others.length > 1 ? 'eligen' : 'elige') + ' fusión…', 999, true);
+        const others = holdBy.filter(n => n !== (G.Social.me && G.Social.me.name) && n !== 'Tú');
+        if (!mine && others.length) G.Spawner.say('Pausa: ' + others.join(', ') + ' ' + (others.length > 1 ? 'están eligiendo…' : 'está eligiendo…'), 999, true);
       } else {
         if (state === 'held' && !awayBy) state = 'playing';
         G.Spawner.say(awayBy ? awayText() : '', awayBy ? 999 : 0, true);
@@ -379,18 +379,26 @@ G.Game = (() => {
   /** Has cogido un objeto: si no llevas ninguno te lo pones; si no, eliges. */
   function offerItem(id) {
     if (!pl || !G.Items.BY[id]) return;
+    let mine = false;            // esta elección es la que ha parado el juego
     const take = got => {
       if (got !== pl.item) {
         pl.equip(got);
         G.Spawner.say('¡Llevas ' + G.Items.BY[got].name + '!', 2.6, true);
         G.Progress.event('item', { id: got });
       }
-      if (state === 'choice') state = 'playing';
+      if (!mine) return;
+      if (state === 'choice') state = holdBy.length ? 'held' : 'playing';
+      if (G.Coop.active) G.Coop.holdEnd();
     };
     if (!pl.item) { take(id); return; }
     if (pl.item === id) { G.Spawner.say('Ya llevas ' + G.Items.BY[id].name, 2, true); return; }
-    // En solitario se para el juego; en grupo sigue (como la pausa).
-    if (!G.Coop.active) state = 'choice';
+    // Se para el juego mientras eliges; en grupo, para todos (como con las
+    // fusiones). Antes en grupo seguía y te pegaban mientras elegías.
+    if (state === 'playing' || state === 'held') {
+      mine = true;
+      state = 'choice';
+      if (G.Coop.active) G.Coop.holdStart();
+    }
     G.RunUI.showItemChoice(pl.item, id, take);
   }
 

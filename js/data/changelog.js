@@ -26,6 +26,8 @@ G.CHANGELOG = [
      'Healers heal more the harder you hit, but with diminishing returns and a cap (2.5x at most).'],
     ['Ataques cuerpo a cuerpo más fuertes: mientras llevas uno activo recibes un 25 % menos de daño, llegan un 25 % más lejos y hacen un 20 % más de daño.',
      'Stronger melee attacks: while one is active you take 25% less damage, and they reach 25% further and deal 20% more damage.'],
+    ['Cooperativo: al elegir con qué objeto quedarte, la partida se para para todos (antes seguía y te pegaban mientras elegías).',
+     'Co-op: choosing which held item to keep now pauses the run for everyone (it used to keep going and you got hit while choosing).'],
     ['Cooperativo: mientras alguien elige una fusión, la partida se para para todos.',
      'Co-op: while someone is choosing a fusion, the run pauses for everyone.'],
     ['Cooperativo: si el anfitrión cambia de pestaña o se le para el juego, la partida se pausa para todos hasta que vuelva.',
