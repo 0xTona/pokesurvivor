@@ -420,10 +420,10 @@ G.DB = (() => {
       if (G.UI && G.UI.refreshCoins) G.UI.refreshCoins();
     }).catch(e => {
       console.warn('[DB] no se pudo sincronizar:', e.code || e.message);
-      // El servidor la rechaza por imposible (partida editada). Se reintenta unas
-      // veces (el margen del servidor crece con el tiempo, por si era un caso
+      // El servidor la rechaza por imposible (partida editada). Se reintenta 10 veces
+      // (casi 1 h: el margen del servidor crece con el tiempo, por si era un caso
       // justo) y si sigue, se ignora el cambio y se vuelve a lo que hay en la nube.
-      if (e.code === 'permission-denied' && ++rejects >= 6) { rejects = 0; return adoptRemote(); }
+      if (e.code === 'permission-denied' && ++rejects >= 10) { rejects = 0; return adoptRemote(); }
       pending = true; failed = true;
       setSync(navigator.onLine === false || e.code === 'unavailable' ? 'offline' : 'pending');
       scheduleRetry();
