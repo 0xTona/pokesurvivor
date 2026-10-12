@@ -183,8 +183,8 @@
         G.FX.ring(this.x, this.y, this.r, this.r * 5, '#ffd23f', 0.6, 4);
       }
       if (this.legend) {
-        // El legendario de la grieta: además del ticket ×10 de todo jefe.
-        G.Pickups.drop('ticket10', this.x + 20, this.y - 16, 1);
+        // El legendario de la grieta: tickets sueltos y monedas (el ×10, como
+        // los jefes, 1 de cada 3 veces; antes daba 2 siempre).
         for (let i = 0; i < 3; i++) G.Pickups.drop('ticket', this.x + G.U.rand(-30, 30), this.y + G.U.rand(-20, 20), 1);
         for (let i = 0; i < 10; i++) G.Pickups.drop('coin', this.x + G.U.rand(-50, 50), this.y + G.U.rand(-35, 35), 8);
       }

@@ -4,7 +4,7 @@
  * jugador. Dura GRIETA_TTL segundos; si entras, te lleva (con todo el grupo)
  * a una arena cerrada en el Mundo Distorsión, contra un Pokémon LEGENDARIO.
  *
- *   ganas    el legendario suelta tickets ×10 y más, y cada uno se lleva un
+ *   ganas    el legendario suelta tickets (el ×10, 1 de cada 3) y monedas, y cada uno se lleva un
  *            VÍNCULO (fusiona movimientos, ver Player.fuse); a los pocos
  *            segundos volvéis al mapa donde estabais y se elige la fusión
  *   pierdes  (caéis todos o se acaba el tiempo) volvéis sin premio, con algo
