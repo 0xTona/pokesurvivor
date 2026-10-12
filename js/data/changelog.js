@@ -14,8 +14,8 @@ G.CHANGELOG = [
     ['Elige la versión normal o shiny de tu compañero desde el menú principal, debajo de él.',
      'Pick the normal or shiny version of your partner right from the main menu, under it.']
   ], chg: [
-    ['Los legendarios de grieta ya no dan siempre tickets x10: dan uno 1 de cada 3 veces, como los jefes (antes daban 2 siempre y salían demasiados).',
-     'Rift legendaries no longer always drop x10 tickets: they drop one 1 time in 3, like bosses (they used to always drop 2, which was too many).'],
+    ['Los legendarios de grieta ya no dan siempre tickets x10: dan uno la mitad de las veces (antes daban 2 siempre y salían demasiados).',
+     'Rift legendaries no longer always drop x10 tickets: they drop one half of the time (they used to always drop 2, which was too many).'],
     ['Gacha: los shiny ya no salen repetidos. Si te toca uno que ya tienes, sale otro de la misma rareza que te falte.',
      'Gacha: shinies no longer come out as duplicates. If you roll one you already have, you get another of the same rarity that you are missing.'],
     ['Grietas con menos azar: cada vez que no sale una, la siguiente es más probable (como mucho 2,5 minutos sin grieta).',
