@@ -103,7 +103,9 @@ G.Ranking = (() => {
   cachePrune();
 
   // Tus mejores marcas por tabla (para no leer antes de escribir).
-  const bestKey = () => 'ps.rk.best.' + (fbx() ? fbx().uid : '');
+  // (best2 desde 2026-10-12: se quitaron del ranking las marcas rotas; así quien
+  //  tenía una vuelve a mirar su marca real y puede volver a entrar.)
+  const bestKey = () => 'ps.rk.best2.' + (fbx() ? fbx().uid : '');
   function bests() { try { return JSON.parse(localStorage.getItem(bestKey()) || '{}'); } catch (e) { return {}; } }
   function saveBests(b) {
     // Sólo se conservan las tablas de los periodos actuales y las históricas.

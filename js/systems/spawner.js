@@ -116,6 +116,11 @@ G.Spawner = (() => {
     preloadT -= dt;
     if (preloadT <= 0) { preloadT = 10; G.Sprites.preload(G.Enemies.upcomingDex(t, 60)); }
 
+    // Aviso al empezar el tiempo extra (los enemigos se endurecen cada vez más
+    // deprisa, ver data/enemies.js).
+    const lf = G.Enemies.LATE_FROM * 60;
+    if (t >= lf && t - dt < lf) { say('¡Los Pokémon salvajes se vuelven cada vez más fuertes!', 3.6); G.Audio.sfx('boss'); }
+
     // --- jefes ---
     const b = G.Enemies.BOSSES[bossIdx];
     if (b && t >= b.at) { spawnBoss(anchor(), t, b); bossIdx++; }
