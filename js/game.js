@@ -479,13 +479,23 @@ G.Game = (() => {
   // El siguiente fotograma se pide ANTES de nada: si algo falla a mitad, el
   // juego sigue (antes se quedaba congelado para siempre y había que recargar;
   // así se perdió una partida enorme al abrirse una grieta).
-  let loopErrs = 0;
+  // Si falla fotograma tras fotograma (el juego ya no avanza ni se ve), la
+  // partida se da por terminada a los ~3 s y se guarda: tiempo, derrotados,
+  // récords y ranking. Mejor eso que una pantalla negra y perderlo todo.
+  let loopErrs = 0, errRun = 0;
   function loop(ts) {
     requestAnimationFrame(loop);
-    try { frame(ts); }
+    try { frame(ts); errRun = 0; }
     catch (e) {
       if (loopErrs++ < 5) console.error('[Game] fallo en un fotograma:', e);
       G.Input.endFrame();
+      if (++errRun === 180 && pl && state !== 'ui' && state !== 'over') {
+        try {
+          G.UI.hideAll();
+          quitRun();
+          G.UI.toast('El juego ha fallado: tu partida se ha guardado hasta aquí', 5000);
+        } catch (e2) { console.error('[Game] no se pudo cerrar la partida:', e2); }
+      }
     }
   }
 

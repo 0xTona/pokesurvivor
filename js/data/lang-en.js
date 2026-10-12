@@ -516,5 +516,6 @@ G.I18n.add({
   '¿Te está gustando PokéSurvivor? Lo hago yo solo y los servidores cuestan dinero. Si quieres, puedes ayudarme a mantenerlo en línea.': "Enjoying PokéSurvivor? I make it on my own and the servers cost money. If you'd like, you can help keep it online.",
   'Apoyar en Ko-fi': 'Support on Ko-fi', 'Entrar con Google (si ya tienes cuenta)': 'Sign in with Google (if you already have an account)',
   'Este mes se han llenado las plazas de cuentas nuevas: vuelven el 1 de {x}. Si ya tienes cuenta, entra normal. Si no, juega como invitado.': "New accounts are full for this month: they reopen on {x} 1. If you already have an account, sign in as usual. If not, play as a guest.",
-  'Este mes ya no quedan plazas para cuentas nuevas (vuelven el 1 de {x}). Mientras, puedes jugar como invitado.': 'There are no new account slots left this month (they reopen on {x} 1). Meanwhile, you can play as a guest.'
+  'Este mes ya no quedan plazas para cuentas nuevas (vuelven el 1 de {x}). Mientras, puedes jugar como invitado.': 'There are no new account slots left this month (they reopen on {x} 1). Meanwhile, you can play as a guest.',
+  'El juego ha fallado: tu partida se ha guardado hasta aquí': 'The game crashed: your run has been saved up to this point'
 });

@@ -34,9 +34,17 @@ G.Guard = (() => {
     run.checkT = 1;
     const real = (performance.now() - run.t0) / 1000;
     if (time > real + 5) flag('reloj');
-    if (!isFinite(p.hp) || p.hp > p.maxHp + 1 || p.maxHp > 6000) flag('vida');
-    if (p.spd > 700) flag('velocidad');
-    if (p.atk > 60) flag('ataque');
+    // Topes con margen sobre lo máximo que se puede juntar jugando (mejoras de
+    // tienda, cartas con su tope, objeto, altar y potenciadores). Antes eran
+    // fijos (ataque 60, velocidad 700, vida 6.000) y las runs de más de una
+    // hora, con muchas cartas, los pasaban sin hacer trampas.
+    //   ataque     1,4 tienda × 1,1^40 cartas × 1,4 objeto × 2 altar ≈ 177
+    //   velocidad  1,24 tienda × 1,07^8 cartas × 1,35 objeto × 1,45 altar ≈ 4,2
+    //   vida       ~265 de base y tienda + 20 por nivel (Vigor)
+    const buff = b => b.n * b.amount;
+    if (!isFinite(p.hp) || p.hp > p.maxHp + 1 || p.maxHp > 400 + 20 * p.level) flag('vida');
+    if (p.spdMul > 5 || p.baseSpd > 200 || buff(p.buffs.spd) > 4) flag('velocidad');
+    if (p.atkMul > 200 || p.baseAtk > 2 || buff(p.buffs.atk) > 4) flag('ataque');
     if (p.level > 10 + time / 4) flag('nivel');
     // En grupo los derrotados y las monedas los reparte el anfitrión: sólo en solitario.
     if (run.prev && !run.coop) {
