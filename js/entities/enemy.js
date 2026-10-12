@@ -213,7 +213,8 @@
       }
       const n = this.net;
       if (!n) return;
-      const lead = Math.min(0.25, n.age);
+      // Se adelanta hasta 0,3 s (por TURN llegan 4 posiciones por segundo).
+      const lead = Math.min(0.3, n.age);
       n.age += dt;
       const tx = n.x + n.vx * lead, ty = n.y + n.vy * lead;
       const ox = this.x, oy = this.y;
