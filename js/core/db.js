@@ -508,6 +508,8 @@ G.DB = (() => {
       'auth/popup-blocked': 'El navegador bloqueó la ventana de Google. Permite las ventanas emergentes.',
       'auth/unauthorized-domain': 'Este dominio no está autorizado en Firebase (Authentication > Configuración > Dominios autorizados).',
       'auth/operation-not-allowed': 'Ese método de inicio de sesión no está activado en Firebase.',
+      // Registro de cuentas nuevas desactivado en Firebase (Authentication > Configuración).
+      'auth/admin-restricted-operation': 'Ahora mismo no se pueden crear cuentas nuevas. Si ya tienes cuenta, entra normal; si no, puedes jugar como invitado.',
       'auth/requires-recent-login': 'Por seguridad, vuelve a iniciar sesión y repite la operación.',
       'permission-denied': 'La base de datos rechazó el acceso (revisa las reglas de Firestore).',
       'unavailable': 'Sin conexión con la base de datos.'
