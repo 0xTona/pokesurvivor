@@ -269,9 +269,9 @@ G.Rift = (() => {
     get rift() { return rift; }, get arena() { return arena; },
     get inArena() { return !!arena; },
     get timeLeft() { return arena ? Math.max(0, ARENA_TIME - arena.t) : 0; },
-    debugOpen() { G.Guard.flag('debug'); open(); },
+    debugOpen() { open(); },
     /** Para pruebas: arena de un tipo ya. */
-    debugArena(type) { G.Guard.flag('debug'); start(type); },
+    debugArena(type) { start(type); },
     /** Para vídeos: la próxima grieta en la que entres será de este tipo. */
     debugNextType(type) { nextType = type; }
   };

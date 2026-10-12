@@ -4,9 +4,8 @@
  *   lbs/{tabla}        RESUMEN: el top 50 de la tabla en UN documento
  *                      { top: { id: { t, uids, names, dex, shiny, lv, kills } }, me, ev }
  *                      Ver una pestaña del ranking = 1 lectura (antes ~52).
- *   lb/{tabla}/e/{id}  la marca de cada jugador o equipo (la que validan las
- *                      reglas contra trampas y la que sirve para calcular tu
- *                      puesto si no estás en el top 50)
+ *   lb/{tabla}/e/{id}  la marca de cada jugador o equipo (la que sirve para
+ *                      calcular tu puesto si no estás en el top 50)
  *
  *   tabla = modo + periodo:
  *     s_d20261008   solitario, hoy            g_...   en grupo
@@ -115,20 +114,6 @@ G.Ranking = (() => {
   }
 
   // ---------------- guardar ----------------
-
-  /**
-   * Al empezar la PRIMERA partida de la sesión: el servidor apunta la hora
-   * (anti-trampas: ninguna marca puede durar más que el tiempo real desde
-   * entonces). Una vez por sesión y no en cada partida, para ahorrar escrituras.
-   */
-  let runMarked = '';
-  function runStarted(mode) {
-    const fb = fbx();
-    if (!fb || runMarked === fb.uid) return;
-    runMarked = fb.uid;
-    fb.fs.collection('runs').doc(fb.uid).set({ startedAt: firebase.firestore.FieldValue.serverTimestamp(), mode })
-      .catch(e => { runMarked = ''; console.warn('[Ranking] inicio:', e.code || e.message); });
-  }
 
   const rowOf = (id, v) => ({ id, t: v.t, uids: v.uids || [], names: v.names || [], dex: v.dex || [], shiny: v.shiny || [], lv: v.lv, kills: v.kills });
   const sorted = top => Object.entries(top || {}).map(([id, v]) => rowOf(id, v)).sort((a, b) => b.t - a.t);
@@ -366,5 +351,5 @@ G.Ranking = (() => {
     try { localStorage.removeItem(bestKey()); } catch (e) { /* nada */ }
   }
 
-  return { PERIODS, periodIds, board, runStarted, submitSolo, submitGroup, top, myRank, removeMine };
+  return { PERIODS, periodIds, board, submitSolo, submitGroup, top, myRank, removeMine };
 })();

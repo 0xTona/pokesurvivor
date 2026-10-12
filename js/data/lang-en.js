@@ -465,7 +465,6 @@ G.I18n.add({
   '¡{x} se ha enfurecido!': '{x} is enraged!',
   'Pulsa para empezar': 'Press to start',
   'Sobrevive a las hordas con tu compañero Pokémon': 'Survive the hordes with your Pokémon partner',
-  'Esta partida no cuenta para el ranking: se ha detectado algo raro': "This run doesn't count for the leaderboard: something odd was detected",
   'Huesomerang': 'Bonemerang', 'Psicocorte': 'Psycho Cut', 'Púas': 'Spikes', 'Púas Tóxicas': 'Toxic Spikes', 'Granizo': 'Hail',
   'Puño Meteoro': 'Meteor Mash', 'Fuego Fatuo': 'Will-O-Wisp', 'Sustituto': 'Substitute', 'Golpe Aéreo': 'Aerial Ace',
   'Rueda Fuego': 'Flame Wheel', 'Rayo Burbuja': 'Bubble Beam', 'Infortunio': 'Hex',

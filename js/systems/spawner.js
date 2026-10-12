@@ -184,5 +184,5 @@ G.Spawner = (() => {
   function tickBanner(dt) { if (announceT > 0) announceT -= dt; }
 
   return { reset, update, ahead, burst, tickBanner, banner, say, rate, SHINY_RATE, CAP,
-           debugForceShiny(n = 1) { G.Guard.flag('debug'); forceShiny = n; } };
+           debugForceShiny(n = 1) { forceShiny = n; } };
 })();
