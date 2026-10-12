@@ -25,8 +25,8 @@ G.Social = (() => {
   const VALID = /^[A-Za-z0-9_ñÑáéíóúÁÉÍÓÚ]{3,16}$/;
   const MAX_PLAYERS = 4;
   const INVITE_TTL = 3 * 60 * 1000;
-  const BEAT = 10 * 60 * 1000;          // latido de presencia
-  const ONLINE = 16 * 60 * 1000;        // "en línea" si el último latido es más reciente
+  const BEAT = 15 * 60 * 1000;          // latido de presencia (era 10 min: menos escrituras)
+  const ONLINE = 22 * 60 * 1000;        // "en línea" si el último latido es más reciente
   const PRES_TTL = 60 * 1000;           // lo leído de los amigos vale 1 min
 
   let fb = null, uid = null;
@@ -460,7 +460,7 @@ G.Social = (() => {
    */
   function publishProfile(force = false) {
     if (!me || !fb) return;
-    if (!force && Date.now() - pubAt < 10 * 60 * 1000) return;
+    if (!force && Date.now() - pubAt < 30 * 60 * 1000) return;     // como mucho cada 30 min (era 10)
     clearTimeout(pubT);
     pubT = setTimeout(() => {
       if (!me || !fb) return;

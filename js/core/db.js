@@ -284,7 +284,7 @@ G.DB = (() => {
   // eran decenas de miles de escrituras por hora); lo que cuesta algo
   // (gacha, mejoras), a los 30 s. La copia local se guarda siempre al momento (y se fusiona con la
   // nube al volver a entrar), y al ocultar o cerrar la pestaña se sube lo pendiente.
-  const PUSH_GAP = 30 * 60 * 1000, PUSH_GAP_URGENT = 30 * 1000;
+  const PUSH_GAP = 30 * 60 * 1000, PUSH_GAP_URGENT = 30 * 1000, HIDE_GAP = 10 * 60 * 1000;
   let syncState = 'local';           // 'ok' | 'syncing' | 'pending' | 'offline' | 'local'
   const listeners = new Set();
 
@@ -321,8 +321,14 @@ G.DB = (() => {
     await auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
     auth.languageCode = 'es';
     addEventListener('online', () => { if (pending) pushNow(); });
-    document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden' && pending) pushNow(); });
-    addEventListener('pagehide', () => { if (pending) pushNow(); });
+    // Al salir de la pestaña o cerrarla se sube lo pendiente, pero no más de una
+    // vez cada 10 min: la gente cambia de pestaña a menudo y cada partida se
+    // subía cada ~9 min en vez de cada 30 (12-10-2026, el mayor gasto de
+    // Firebase). Lo que no se sube sigue en la copia de este navegador y se
+    // sube al volver a entrar.
+    const hideFlush = () => { if (pending && Date.now() - lastPush > HIDE_GAP) pushNow(); };
+    document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') hideFlush(); });
+    addEventListener('pagehide', hideFlush);
     return true;
   }
 
@@ -365,7 +371,10 @@ G.DB = (() => {
     // Sólo se sube si hay algo que la nube no tenga (cuenta nueva, progreso de
     // este ordenador sin subir...), y SIN esperar: antes el menú no salía hasta
     // terminar la subida, y con Firebase lento se tardaba hasta 9 s en entrar.
-    const same = remote && JSON.stringify(plain(migrate(remote))) === JSON.stringify(plain(save));
+    // (Comparar el texto entero daba "distinto" casi siempre y se subía en cada
+    // entrada: ahora sólo si esta copia es más nueva que la de la nube.)
+    const same = remote && !opts.legacy && (!cached || (cached.updated || 0) <= (remote.updated || 0));
+    lastPush = Date.now();       // la primera compra o ticket no sube al momento: espera como las demás
     if (!online) { pending = true; setSync('offline'); scheduleRetry(); }
     else if (same) setSync('ok');
     else pushNow();
