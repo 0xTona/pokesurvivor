@@ -2,10 +2,17 @@
  * Cajas azules con doble borde blanco, como los menús de PMD, y fuente pixel
  * local (Pixelify Sans, OFL).
  */
+/* Pixelify Sans con los números redibujados para que no se confundan (tools/make_font.py). */
 @font-face {
   font-family: 'Pixelify';
-  src: url('../assets/fonts/PixelifySans.ttf') format('truetype');
-  font-weight: 400 700;
+  src: url('../assets/fonts/PixelifyPS-400.ttf') format('truetype');
+  font-weight: 400 550;
+  font-display: block;
+}
+@font-face {
+  font-family: 'Pixelify';
+  src: url('../assets/fonts/PixelifyPS-700.ttf') format('truetype');
+  font-weight: 551 900;
   font-display: block;
 }
 

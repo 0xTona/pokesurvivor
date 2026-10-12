@@ -9,6 +9,8 @@ G.CHANGELOG = [
   { d: '2026-10-12', title: ['Partidas sin límite y grietas con menos azar', 'Endless runs and less random rifts'], new: [
     ['Botón de Novedades (esta ventana) con todos los cambios del juego.',
      'A "What\'s new" button (this window) with every change to the game.'],
+    ['Números más fáciles de leer: el 2, el 5 y el 8 ya no se confunden.',
+     'Easier to read numbers: 2, 5 and 8 no longer look alike.'],
     ['Elige la versión normal o shiny de tu compañero desde el menú principal, debajo de él.',
      'Pick the normal or shiny version of your partner right from the main menu, under it.']
   ], chg: [
