@@ -86,7 +86,7 @@ G.Game = (() => {
 
   /** @param coop  { seed, host, members } para una partida en grupo */
   function startRun(coop = null) {
-    holdBy = [];
+    holdBy = []; awayBy = null;
     const save = G.DB.save;
     const mon = G.DEX_BY[save.partner];
     const perks = G.Upgrades.perks(G.DB.upgradesOf(mon.dex));
@@ -223,11 +223,24 @@ G.Game = (() => {
         const others = mine ? holdBy.filter(n => n !== (G.Social.me && G.Social.me.name)) : holdBy;
         if (!mine && others.length) G.Spawner.say('Pausa: ' + others.join(', ') + ' ' + (others.length > 1 ? 'eligen' : 'elige') + ' fusión…', 999, true);
       } else {
+        if (state === 'held' && !awayBy) state = 'playing';
+        G.Spawner.say(awayBy ? awayText() : '', awayBy ? 999 : 0, true);
+      }
+    },
+    /** Grupo (invitado): el anfitrión se ha ido de la pestaña o no responde: todo parado. */
+    away(name) {
+      awayBy = name || null;
+      if (awayBy) {
+        if (state === 'playing') state = 'held';
+        G.Spawner.say(awayText(), 999, true);
+      } else if (!holdBy.length) {
         if (state === 'held') state = 'playing';
         G.Spawner.say('', 0, true);
       }
     }
   };
+  let awayBy = null;
+  const awayText = () => 'Pausa: esperando a ' + awayBy + ' (anfitrión)…';
 
   /** Has llevado a casa a un Pokémon perdido y se une a ti (events.js). */
   G.onRescue = (dex, name) => {
@@ -782,7 +795,7 @@ G.Flow = {
   boot() {
     G.UI.initChrome();
     G.LoginUI.init(); G.TestUI.init(); G.MenuUI.init(); G.GachaUI.init();
-    G.SocialUI.init(); G.RankingUI.init(); G.GoalsUI.init(); G.ProfileUI.init(); G.SettingsUI.init(); G.SupportUI.init();
+    G.SocialUI.init(); G.RankingUI.init(); G.GoalsUI.init(); G.ProfileUI.init(); G.SettingsUI.init(); G.SupportUI.init(); G.NewsUI.init();
     // Tu nombre arriba a la derecha abre tu perfil.
     document.getElementById('user-pill').onclick = () => G.GoalsUI.open('profile');
     G.Audio.music('village');     // suena tras el primer clic (lo exige el navegador)

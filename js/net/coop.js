@@ -33,6 +33,11 @@ G.Coop = (() => {
   let api = {};                         // callbacks del juego (game.js)
   let waiting = new Set();              // subida de nivel: quién falta por elegir
   let holds = new Set();                // quién está eligiendo una fusión (la partida se para para todos)
+  // El anfitrión mueve a los enemigos: si cambia de pestaña (o se le congela),
+  // todo se para para todos. Antes los enemigos se quedaban quietos y los demás
+  // seguían jugando con una ventaja enorme.
+  let hostAway = false, stalled = false, lastHostAt = 0;
+  const STALL_MS = 2500;
   let members = [];
 
   // ---------------- escalado de dificultad ----------------
@@ -56,6 +61,7 @@ G.Coop = (() => {
     members = cfg.members;
     mates.clear();
     outEv = []; flushT = 0; waiting = new Set(); holds = new Set();
+    hostAway = false; stalled = false; lastHostAt = performance.now();
     cfg.members.forEach((m, i) => {
       const x = (i - (cfg.members.length - 1) / 2) * 34, y = 0;
       if (m.uid === me) { pl.x = x; pl.y = y; pl.uid = me; pl.coopHost = host; pl.tagColor = COLORS[i]; return; }
@@ -187,6 +193,7 @@ G.Coop = (() => {
         G.Net.send(m.uid, hostFrame(m));
       }
     } else {
+      if (!stalled && performance.now() - lastHostAt > STALL_MS) { stalled = true; updateAway(); }
       flushT -= dt;
       if (flushT <= 0) {
         flushT = rateFor(hostUid);
@@ -265,7 +272,20 @@ G.Coop = (() => {
 
   // --- en el invitado ---
 
+  /** Invitado: se para (o sigue) según si el anfitrión está. */
+  function updateAway() { if (api.away) api.away(hostAway || stalled ? nameOf(hostUid) : null); }
+
+  // Anfitrión: al irse de la pestaña avisa a todos al momento (después ya no
+  // podrá mandar nada) y al volver, que sigue.
+  document.addEventListener('visibilitychange', () => {
+    if (!active || !host) return;
+    emit(['ha', document.hidden ? 1 : 0]);
+    flushAll();
+  });
+
   function onHostFrame(msg) {
+    lastHostAt = performance.now();
+    if (stalled) { stalled = false; updateAway(); }
     for (const ev of msg.ev || []) applyHostEvent(ev);
     api.syncTeam({ time: msg.t, level: msg.lv, xp: msg.xp, xpNext: msg.xn, kills: msg.ki, bosses: msg.bo, coins: msg.co,
                    t1: (msg.tk || [])[0], t10: (msg.tk || [])[1] });
@@ -318,6 +338,7 @@ G.Coop = (() => {
       case 'lw': api.waiting(ev[1]); break;
       case 'lr': api.resume(); break;
       case 'hp': api.hold && api.hold(ev[1]); break;
+      case 'ha': hostAway = !!ev[1]; updateAway(); break;
       case 'sh': api.shiny(ev[1]); break;
       case 'ov': { const cb = api.over; const d = ev[1]; end(); cb(d); break; }
       case 'rift': case 'riftx': case 'arena': case 'aw': case 'al': G.Rift.onEvent(ev); break;

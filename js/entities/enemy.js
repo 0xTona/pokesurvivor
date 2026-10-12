@@ -586,11 +586,16 @@
     }
 
     healAround() {
+      // 7 % de la vida (era 15 %: con varios curanderos curaban más de lo que
+      // pegabas), y más cuanto más fuerte pegas, pero cada vez menos: con el
+      // doble de ataque cura un 27 % más, con 10 veces más un 124 %, y como
+      // mucho ×2,5. (Como los enemigos que tienen más vida si haces más daño.)
+      const pow = Math.max(1, ...G.Game.everyone().map(p => (p.atk > 0 && p.baseAtk > 0 ? p.atk / p.baseAtk : 1)));
+      const k = 0.07 * Math.min(2.5, Math.pow(pow, 0.35));
       let n = 0;
       for (const e of G.EnemyMgr.queryCircle(this.x, this.y, 150)) {
         if (e.dead || e.hp >= e.maxHp) continue;
-        // 7 % (era 15 %: con varios curanderos curaban más de lo que pegabas).
-        e.hp = Math.min(e.maxHp, e.hp + e.maxHp * 0.07);
+        e.hp = Math.min(e.maxHp, e.hp + e.maxHp * k);
         G.FX.burst(e.x, e.y - e.bodyH * 0.6, '#7dffb0', 5, 60);
         n++;
       }

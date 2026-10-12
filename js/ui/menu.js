@@ -43,6 +43,20 @@ G.MenuUI = (() => {
     $('menu-partner').classList.toggle('shiny', shiny);
     $('menu-partner-name').innerHTML = mon.name + (shiny ? ' ' + G.Icons.html('shiny', 24) : '');
     $('menu-partner-info').innerHTML = G.UI.typeChips(mon.types) + ' ' + G.UI.stars(mon.rarity);
+    // Normal / shiny a mano, aquí mismo (en el móvil no se encontraba en la ficha).
+    const seg = $('menu-shiny');
+    seg.classList.toggle('hidden', !G.DB.ownsShiny(mon.dex));
+    seg.lastChild.innerHTML = G.Icons.html('shiny', 12) + ' Shiny';
+    seg.querySelectorAll('button').forEach(b => {
+      b.classList.toggle('on', (b.dataset.v === '1') === shiny);
+      b.onclick = () => {
+        if ((b.dataset.v === '1') === shiny) return;
+        s.partnerShiny = b.dataset.v === '1';
+        G.DB.commit();
+        G.Audio.sfx('confirm');
+        open();
+      };
+    });
 
     const owned = Object.keys(s.owned).filter(d => G.DEX_BY[d]).length;
     const shinies = Object.keys(s.shiny || {}).length;

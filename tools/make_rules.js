@@ -31,7 +31,8 @@ function run() {
   const src = fs.readFileSync(RULES, 'utf8');
   const re = /    \/\/ <logros>[\s\S]*?\/\/ <\/logros>/;
   if (!re.test(src)) throw new Error('faltan las marcas <logros> en firestore.rules');
-  const out = src.replace(re, block);
+  const nl = src.includes('\r\n') ? '\r\n' : '\n';       // los mismos saltos de línea que el archivo
+  const out = src.replace(re, block.replace(/\n/g, nl));
   if (out !== src) {
     fs.writeFileSync(RULES, out);
     console.log('firestore.rules: lista de logros actualizada (' + ids.length + '). Despliega: firebase deploy --only firestore');

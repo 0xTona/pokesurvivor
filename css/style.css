@@ -626,6 +626,10 @@ a.plink:hover { color: var(--gold); }
 /* ================= móvil y táctil ================= */
 html, body { overscroll-behavior: none; -webkit-tap-highlight-color: transparent; -webkit-touch-callout: none; }
 body { touch-action: manipulation; }
+/* iPhone: sin esto, mantener el dedo en el joystick sacaba "Copiar / Seleccionar
+   todo" (Safari sólo hace caso a la versión -webkit- y no lo hereda bien). */
+body, body * { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
+input, textarea, [contenteditable] { -webkit-user-select: text; user-select: text; -webkit-touch-callout: default; }
 /* Con táctil no tienen sentido las pistas de teclas. */
 body.touch kbd, body.touch .card .key, body.touch .kbd-hint { display: none !important; }
 #rotate {
@@ -740,6 +744,16 @@ a.btn { text-decoration: none; display: inline-block; color: var(--ink); }
 /* ---------- apoyar el proyecto ---------- */
 #scr-support { z-index: 60; }
 .box.support { width: min(560px, 100%); }
+/* Novedades */
+.news-btn { position: relative; }
+.news-btn .dot { display: none; position: absolute; top: 3px; right: 3px; width: 8px; height: 8px; background: #ff5f6d; box-shadow: 0 0 0 2px var(--shadow); }
+.news-btn.new .dot { display: block; }
+.box.news-box { width: min(640px, 100%); max-height: calc(100dvh - 90px); display: flex; flex-direction: column; }
+.news-body { overflow-y: auto; padding-right: 4px; }
+.news-day h3 { color: var(--gold); margin: 12px 0 4px; font-size: 17px; }
+.news-day ul { margin: 0; padding-left: 20px; }
+.news-day li { margin: 4px 0; line-height: 1.35; font-size: 15px; }
+@media (max-width: 760px) { .news-btn span { display: none; } }
 .sup-tab { width: 100%; border-collapse: collapse; margin: 6px 0 10px; font-size: 15px; }
 .sup-tab td { padding: 5px 4px; border-bottom: 1px solid rgba(255,255,255,.1); }
 .sup-tab td.num { text-align: right; white-space: nowrap; }
