@@ -544,6 +544,8 @@ input[type=range]::-moz-range-thumb { width: 14px; height: 14px; border-radius: 
 .rk-rep:hover { opacity: 1; }
 .rk-rep.sent { opacity: .12; cursor: default; }
 .rk-row.mod-row { grid-template-columns: 54px 1fr auto; }
+.rk-row.mod-row.rep { grid-template-columns: 54px auto 1fr auto auto; }
+.mod-warn { color: #ff8a96 !important; }
 .mod-acts { display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end; }
 .rk-me { margin-top: 10px; padding: 10px 12px; border-radius: 8px; background: rgba(0,0,0,.25); font-size: 15px; min-height: 20px; }
 

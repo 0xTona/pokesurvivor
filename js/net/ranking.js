@@ -435,6 +435,12 @@ G.Ranking = (() => {
     return [...by.values()].sort((a, b) => b.n - a.n || b.at - a.at);
   }
 
+  /** Admin: la fila de una marca en el top 50 de su tabla (o null si ya no está). */
+  async function entryInfo(b, e) {
+    const top = await summary(b);
+    return top[e] ? rowOf(e, top[e]) : null;
+  }
+
   /** Admin: quita una marca de una tabla (la marca y su fila del top 50). */
   async function removeEntry(b, e) {
     const fb = fbx();
@@ -470,5 +476,5 @@ G.Ranking = (() => {
   }
 
   return { PERIODS, periodIds, board, runStarted, submitSolo, submitGroup, top, myRank, removeMine,
-           report, reported, isAdmin, reports, removeEntry, removeEverywhere, setMarked, dismiss, markedAccounts };
+           report, reported, isAdmin, reports, entryInfo, removeEntry, removeEverywhere, setMarked, dismiss, markedAccounts };
 })();
