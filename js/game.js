@@ -109,6 +109,7 @@ G.Game = (() => {
     G.World.setBiome(0, true);
     biome = 0;
     time = 0; pendingLevels = 0;
+    runReal = performance.now(); tampered = false;
 
     pl = new G.Player(mon, perks, !!save.partnerShiny && G.DB.ownsShiny(mon.dex));
     banked = { t1: 0, t10: 0 };
@@ -310,8 +311,10 @@ G.Game = (() => {
 
     // Ranking: en solitario cada uno lo suyo; en grupo lo sube el anfitrión.
     const mark = { t: Math.floor(time), lv: pl.level, kills: pl.kills };
-    if (!coop) G.Ranking.submitSolo(Object.assign(mark, { dex: pl.dex, shiny: pl.shiny }));
-    else if (wasHost) G.Ranking.submitGroup(Object.assign(mark, { members: team }));
+    // Si la partida se ha tocado (ver clean()), no sube al ranking (sin avisar); lo demás, sí.
+    const ok = clean();
+    if (ok && !coop) G.Ranking.submitSolo(Object.assign(mark, { dex: pl.dex, shiny: pl.shiny }));
+    else if (ok && wasHost) G.Ranking.submitGroup(Object.assign(mark, { members: team }));
 
     G.RunUI.showOver({
       dead, time, level: pl.level, kills: pl.kills, bosses: pl.bosses, coins, record, t1: pl.t1, t10: pl.t10, judge,
@@ -319,6 +322,25 @@ G.Game = (() => {
       breakdown: Object.entries(parts).filter(([, v]) => v).map(([k, v]) => `${k} ${v}`).join(' · ') +
                  (mul > 1 ? ` · ×${mul.toFixed(2)} Fortuna` : '')
     }, () => { pl = null; G.Flow.afterRun(); });
+  }
+
+  /*
+   * ¿Partida limpia? Sólo cosas que ningún jugador legal puede hacer, con
+   * márgenes enormes (el sistema del 10-10 daba falsos positivos):
+   *   - el reloj de la partida va más deprisa que el real (trucos de velocidad)
+   *   - funciones de tu Pokémon sustituidas (así se hace uno invencible)
+   *   - vida, ataque, velocidad o recarga muy por encima de lo posible
+   *   - se han usado las funciones de pruebas (saltar el reloj...)
+   * Si algo salta, esa partida no sube al ranking (sin avisar) y nada más.
+   */
+  let runReal = 0, tampered = false;
+  function clean() {
+    if (tampered) return false;
+    if (time > (performance.now() - runReal) / 1000 + 10) return false;
+    for (const k of ['hurt', 'update', 'heal', 'gainXp']) if (Object.prototype.hasOwnProperty.call(pl, k)) return false;
+    if (!isFinite(pl.hp) || !isFinite(pl.maxHp) || pl.hp > pl.maxHp + 1 || pl.maxHp > 50000) return false;
+    if (pl.atkMul > 2000 || pl.spdMul > 25 || pl.cdMul < 0.03 || pl.level > 20 + time / 3) return false;
+    return true;
   }
 
   // ---------------- subida de nivel ----------------
@@ -808,14 +830,14 @@ G.Game = (() => {
   return {
     init, startRun, everyone, levelXp, flash, offerBond,
     /** Para pruebas: salta el reloj de la run. */
-    debugTime(t) { time = t; },
+    debugTime(t) { tampered = true; time = t; },
     /** Para grabar vídeos: cámara lenta (0,5 = mitad de velocidad). */
-    debugSpeed(k) { speedK = k; },
+    debugSpeed(k) { if (k > 1) tampered = true; speedK = k; },
     togglePause,
     /** Abandona la partida en curso (p. ej. al cerrar sesión desde Ajustes). */
     quit() { if (state !== 'ui' && state !== 'over') quitRun(); },
     /** Para grabar vídeos: abre las cartas de subir de nivel. */
-    debugLevelUp() { pl.level++; pendingLevels++; },
+    debugLevelUp() { tampered = true; pl.level++; pendingLevels++; },
     toUI() { state = 'ui'; Backdrop.restore(); },
     get state() { return state; }, get player() { return pl; }, st
   };

@@ -18,14 +18,14 @@ G.ModUI = (() => {
   function init() {
     $('mod-back').onclick = () => G.RankingUI.open();
     $('mod-purge').onclick = async () => {
-      if (!confirm('¿Quitar del ranking TODAS las marcas de más de 35 minutos (todas las tablas)? No se puede deshacer.')) return;
+      if (!confirm('¿Quitar del ranking TODAS las marcas de más de 1 hora (todas las tablas)? No se puede deshacer.')) return;
       const b = $('mod-purge');
       b.disabled = true;
       try {
-        const r = await G.Ranking.purgeAbove(35 * 60, (i, n) => { b.textContent = 'Revisando ' + i + ' / ' + n + '…'; });
-        G.UI.toast('Quitadas ' + r.rows + ' marcas de más de 35 min (' + r.boards + ' tablas)', 5000);
+        const r = await G.Ranking.purgeAbove(3600, (i, n) => { b.textContent = 'Revisando ' + i + ' / ' + n + '…'; });
+        G.UI.toast('Quitadas ' + r.rows + ' marcas de más de 1 hora (' + r.boards + ' tablas)', 5000);
       } catch (e) { G.UI.toast('No se pudo: ' + (e.code || e.message), 5000); }
-      b.disabled = false; b.textContent = 'Quitar marcas de más de 35 min';
+      b.disabled = false; b.textContent = 'Quitar marcas de más de 1 hora';
       render();
     };
     document.querySelectorAll('#mod-tabs .tab').forEach(t => { t.onclick = () => { tab = t.dataset.tab; render(); }; });
