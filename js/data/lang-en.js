@@ -552,6 +552,14 @@ G.I18n.add({
   'Desafío divino': 'Divine challenge', 'Derrota a 3 legendarios ante Arceus en una partida.': 'Defeat 3 legendaries against Arceus in a single run.',
   'Juzgado': 'Judged', 'Elegido de Arceus': 'Chosen of Arceus',
 
+  // ---------------- recuperar la cuenta (vincular Gmail) ----------------
+  '¿Olvidaste tu contraseña?': 'Forgot your password?',
+  '¿Te da miedo perder tu cuenta?': 'Afraid of losing your account?',
+  'Vincular mi Gmail': 'Link my Gmail', 'Ahora no': 'Not now', 'No volver a preguntar': "Don't ask again",
+  '¡Gmail vinculado! Si olvidas la contraseña, entra con Google.': 'Gmail linked! If you forget your password, sign in with Google.',
+  'Ese Gmail ya tiene su propia cuenta del juego. Usa otro Gmail.': 'That Gmail already has its own game account. Use another Gmail.',
+  'Inicia sesión primero.': 'Sign in first.',
+
   // ---------------- reportar marcas del ranking ----------------
   'Reportar marca sospechosa': 'Report suspicious record', 'Ya la has reportado': 'You already reported it',
   'Ya has reportado esta marca': 'You already reported this record',

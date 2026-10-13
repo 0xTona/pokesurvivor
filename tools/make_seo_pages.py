@@ -471,6 +471,9 @@ def ach_page(lang):
 
 # ================= novedades =================
 NEWS = [
+ ('2026-10-14', ('Recupera tu cuenta con Gmail', 'Recover your account with Gmail'),
+  ('Si juegas con nombre y contraseña, ya puedes vincular tu Gmail: si olvidas la contraseña, entras con Google y es tu misma cuenta.',
+   'If you play with a name and password, you can now link your Gmail: if you forget your password, sign in with Google and it is the same account.')),
  ('2026-10-13', ('La Sentencia de Arceus', 'The Judgment of Arceus'),
   ('Al llegar al minuto 30, Arceus baja del cielo y te lleva a las Ruinas del Juicio: es invencible, te persigue cada vez más deprisa y cada 5 segundos acude un legendario con el doble de vida y de daño que el anterior. Tres logros nuevos, música nueva y el ranking histórico empieza de cero.',
    'At minute 30, Arceus descends from the sky and takes you to the Ruins of Judgment: it is invincible, chases you faster and faster, and every 5 seconds a legendary joins with twice the HP and damage of the previous one. Three new achievements, new music, and the all-time leaderboard starts from scratch.')),
