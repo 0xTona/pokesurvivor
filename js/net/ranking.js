@@ -464,6 +464,42 @@ G.Ranking = (() => {
     await Promise.all([...boards].map(b => removeEntry(b, e)));
   }
 
+  /**
+   * Admin: quita de TODAS las tablas las marcas de más de `maxT` segundos (las
+   * filas de cada top 50 y las marcas sueltas del histórico). Con la Sentencia
+   * de Arceus nadie legal pasa de ~32 min. → { rows, boards }
+   */
+  async function purgeAbove(maxT, onProgress) {
+    const fs = fbx().fs;
+    const all = await fs.collection('lbs').get();
+    let rows = 0, boards = 0, n = 0;
+    for (const d of all.docs) {
+      n++;
+      if (onProgress && n % 50 === 0) onProgress(n, all.size);
+      const top = d.data().top || {};
+      const bad = Object.keys(top).filter(id => (top[id].t || 0) > maxT);
+      if (!bad.length) continue;
+      await fs.runTransaction(async tx => {
+        const s = await tx.get(d.ref);
+        const cur = Object.assign({}, (s.exists && s.data().top) || {});
+        const gone = Object.keys(cur).filter(id => (cur[id].t || 0) > maxT);
+        if (!gone.length) return;
+        for (const id of gone) delete cur[id];
+        tx.set(d.ref, { top: cur, me: '', ev: gone[0] });
+      });
+      await Promise.all(bad.map(id => fs.collection('lb').doc(d.id).collection('e').doc(id).delete().catch(() => {})));
+      rows += bad.length; boards++;
+      mem.delete('s:' + d.id); try { localStorage.removeItem('ps.rk.c.s:' + d.id); } catch (e) { /* nada */ }
+    }
+    // Las marcas del histórico que no están en el top 50 (sirven para el puesto exacto).
+    for (const b of ['s_' + ALL, 'g_' + ALL]) {
+      const q = await col(b).where('t', '>', maxT).get();
+      await Promise.all(q.docs.map(e => e.ref.delete().catch(() => {})));
+      rows += q.size;
+    }
+    return { rows, boards };
+  }
+
   /** Admin: marca o desmarca una cuenta (marcada = no puede subir marcas). */
   function setMarked(uid, on) { return fbx().fs.collection('saves').doc(uid).update({ sus: !!on }); }
   /** Admin: borra reportes ya vistos. */
@@ -476,5 +512,5 @@ G.Ranking = (() => {
   }
 
   return { PERIODS, periodIds, board, runStarted, submitSolo, submitGroup, top, myRank, removeMine,
-           report, reported, isAdmin, reports, entryInfo, removeEntry, removeEverywhere, setMarked, dismiss, markedAccounts };
+           report, reported, isAdmin, reports, entryInfo, removeEntry, purgeAbove, removeEverywhere, setMarked, dismiss, markedAccounts };
 })();

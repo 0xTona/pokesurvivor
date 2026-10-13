@@ -22,7 +22,9 @@ G.CHANGELOG = [
     ['Desde el minuto 28 ya no se abren grietas, para que la Sentencia no te pille dentro de una.',
      'Rifts no longer open from minute 28 on, so the Judgment does not catch you inside one.'],
     ['Ranking protegido contra trampas: el servidor comprueba que cada marca se ha jugado de verdad. Nunca se pierde nada de lo que ganas jugando.',
-     'Leaderboard protected against cheating: the server checks that every record was really played. You never lose anything you earn by playing.']
+     'Leaderboard protected against cheating: the server checks that every record was really played. You never lose anything you earn by playing.'],
+    ['Se han quitado del ranking las marcas de más de 35 minutos: con la Sentencia de Arceus ya no son posibles.',
+     'Records over 35 minutes have been removed from the leaderboard: with the Judgment of Arceus they are no longer possible.']
   ] },
   { d: '2026-10-12', title: ['Tiempo extra y grietas con menos azar', 'Overtime and less random rifts'], new: [
     ['Tiempo extra: desde el minuto 60 los Pokémon salvajes se vuelven cada vez más fuertes (más vida y más daño), y cada vez más deprisa. Antes, con las mejoras al máximo, algunas partidas no acababan nunca; ahora las mejores rondarán la hora y media.',
