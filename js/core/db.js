@@ -47,8 +47,20 @@ G.DB = (() => {
     catch (e) { storageOk = false; return null; }
   }
   function write(k, v) {
-    try { localStorage.setItem(k, JSON.stringify(v)); return true; }
-    catch (e) { storageOk = false; return false; }
+    const s = JSON.stringify(v);
+    try { localStorage.setItem(k, s); return true; }
+    catch (e) {
+      // Navegador lleno (sobre todo por lo que guarda el ranking): se libera lo
+      // prescindible y se reintenta. Antes la copia de la partida dejaba de
+      // guardarse sin avisar y, al recargar, se volvía a la de la nube.
+      try {
+        for (let i = localStorage.length - 1; i >= 0; i--) {
+          const key = localStorage.key(i);
+          if (key && /^ps\.rk\.c\./.test(key)) localStorage.removeItem(key);
+        }
+        localStorage.setItem(k, s); return true;
+      } catch (e2) { storageOk = false; return false; }
+    }
   }
   function remove(k) { try { localStorage.removeItem(k); } catch (e) { /* nada */ } }
 
@@ -308,8 +320,12 @@ G.DB = (() => {
   // en la copia del navegador al momento, y se sube al salir de la pestaña.
   // Desde el 13-10-2026, lo normal cada 2 h (era 30 min: 216.000 jugadores al día
   // guardaban unas 12 millones de veces); al cerrar la pestaña, siempre; al
-  // cambiar de pestaña, si hace más de 30 min; y tras un récord, a los 3 min.
-  const PUSH_GAP = 2 * 3600 * 1000, PUSH_GAP_URGENT = 3 * 60 * 1000, HIDE_GAP = 30 * 60 * 1000;
+  // cambiar de pestaña, si hace más de 30 min.
+  // Lo que vale algo (tiradas, compras, Pokémon nuevos, shinies, premios,
+  // récords) se sube enseguida, y al acabar cada partida como mucho cada 20 min:
+  // con 2 h, quien abría el juego en otro aparato (o en el navegador de otra
+  // app) veía la copia vieja de la nube y creía que lo había perdido.
+  const PUSH_GAP = 2 * 3600 * 1000, PUSH_GAP_URGENT = 15 * 1000, PUSH_GAP_RUN = 20 * 60 * 1000, HIDE_GAP = 30 * 60 * 1000;
   let syncState = 'local';           // 'ok' | 'syncing' | 'pending' | 'offline' | 'local'
   const listeners = new Set();
 
@@ -618,8 +634,10 @@ G.DB = (() => {
   }
 
   /**
-   * Guarda la partida actual (no hace nada en modo invitado).
-   * @param urgent  lo que ha costado algo (tiradas del gacha, mejoras): se sube antes
+   * Guarda la partida actual (no hace nada en modo invitado). En el navegador,
+   * al momento; en la nube:
+   * @param urgent  true: lo que vale algo (tiradas, compras, Pokémon, premios): enseguida
+   *                'run': al acabar una partida (como mucho cada 20 min) · false: cada 2 h
    */
   function commit(urgent = false) {
     if (guest || !key || !save) return false;
@@ -628,7 +646,8 @@ G.DB = (() => {
     write(K_CLOUD + uid, save);
     pending = true;
     setSync('pending');
-    schedulePush(Math.max(1200, (urgent ? PUSH_GAP_URGENT : PUSH_GAP) - (Date.now() - lastPush)));
+    const gap = urgent === 'run' ? PUSH_GAP_RUN : urgent ? PUSH_GAP_URGENT : PUSH_GAP;
+    schedulePush(Math.max(1200, gap - (Date.now() - lastPush)));
     return true;
   }
 

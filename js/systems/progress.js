@@ -89,7 +89,7 @@ G.Progress = (() => {
     grant(G.MissionDefs.BY[m.id].reward);
     s.stats.missionsDone = (s.stats.missionsDone || 0) + 1;
     event('missionDone', { daily: !weekly });
-    G.DB.commit();
+    G.DB.commit(true);
     return true;
   }
 

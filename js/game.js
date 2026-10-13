@@ -181,7 +181,7 @@ G.Game = (() => {
     if (!d1 && !d10) return;
     sv.tickets.t1 += d1; sv.tickets.t10 += d10;
     banked = { t1: pl.t1, t10: pl.t10 };
-    if (save_) G.DB.commit();
+    if (save_) G.DB.commit('run');
   }
 
   const coopApi = {
@@ -252,7 +252,7 @@ G.Game = (() => {
   G.onRescue = (dex, name) => {
     if (!G.DB.save || !pl) return;
     const isNew = !G.DB.owns(dex);
-    if (isNew) { G.DB.grant(dex, 'rescue'); G.DB.commit(); }
+    if (isNew) { G.DB.grant(dex, 'rescue'); G.DB.commit(true); }
     else pl.coins += 150;
     G.Spawner.say(isNew ? '¡' + name + ' se une a tu equipo!' : '¡' + name + ' te da las gracias! (+150 monedas, ya lo tenías)', 4);
     G.Audio.sfx('shinyGet');
@@ -264,7 +264,7 @@ G.Game = (() => {
     if (G.Coop.isHost) G.Coop.shinyCaught(e);
     const isNew = G.DB.grantShiny(e.dex, 'wild');
     G.DB.save.stats.shinies++;
-    G.DB.commit();
+    G.DB.commit(true);
     caught.push({ dex: e.dex, isNew });
     G.Spawner.say(isNew ? '¡Has conseguido a ' + e.name + ' shiny!' : '¡Otro ' + e.name + ' shiny! (+300 monedas)', 4);
     if (!isNew) pl.coins += 300;
@@ -305,8 +305,8 @@ G.Game = (() => {
     G.Judgment.reset();
     G.Progress.event('runEnd', { time, level: pl.level, coins: pl.coins, types: pl.mon.types, group: coop });
     G.Progress.checkAch();
-    // Un récord se sube a la nube enseguida (lo demás, cada 2 h o al salir).
-    G.DB.commit(record);
+    // A la nube: un récord, enseguida; si no, al acabar la partida (como mucho cada 20 min).
+    G.DB.commit(record ? true : 'run');
     if (G.Social.me) G.Social.publishProfile();
 
     // Ranking: en solitario cada uno lo suyo; en grupo lo sube el anfitrión.
