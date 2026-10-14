@@ -368,6 +368,13 @@ G.Social = (() => {
     ref.onDisconnect().remove();
   }
 
+  /** Al empezar la partida: cancela onDisconnect para que un parpadeo de RTDB no borre la sala en plena partida. */
+  function disarmRoomDisconnect() {
+    if (!room || !fb || !fb.rtdb) return;
+    const ref = room.isHost ? fb.rtdb.ref('rooms/' + room.id) : fb.rtdb.ref('rooms/' + room.id + '/m/' + uid);
+    ref.onDisconnect().cancel().catch(() => {});
+  }
+
   function detachRoom() {
     for (const r of roomRefs) r.off();
     roomRefs = [];
@@ -375,6 +382,8 @@ G.Social = (() => {
 
   function closedRoom() {
     if (!room) return;
+    // Si la partida cooperativa ya está en marcha por WebRTC, no se tira la conexión por un corte de RTDB.
+    if (typeof G === 'object' && G.Coop && G.Coop.active) return;
     detachRoom();
     room = null;
     retractInvites();
@@ -522,7 +531,7 @@ G.Social = (() => {
   return {
     start, stop, claimNick, request, accept, remove, publishProfile, getProfile, profileData,
     createRoom, joinRoom, leaveRoom, setOpen, refreshMember, setPlaying, refreshPresence,
-    invite, acceptInvite, declineInvite,
+    invite, acceptInvite, declineInvite, disarmRoomDisconnect, watchRoomDisconnect,
     on(fn) { listeners.add(fn); }, off(fn) { listeners.delete(fn); },
     get me() { return me; },
     get started() { return started; },

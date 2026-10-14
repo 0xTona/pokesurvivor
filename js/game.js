@@ -934,6 +934,7 @@ G.Flow = {
       if (G.Game.state !== 'ui') G.Game.toUI();
       G.Audio.music('village');
       if (G.Social.room.isHost) G.Social.setOpen(true);
+      if (G.Social.watchRoomDisconnect) G.Social.watchRoomDisconnect();
       G.LobbyUI.open();
     } else this.goMenu();
   },
@@ -941,6 +942,7 @@ G.Flow = {
   /** Empieza la partida en grupo (el anfitrión la manda a todos). */
   startCoop(cfg) {
     if (G.Game.state !== 'ui' || !G.Social.room) return;
+    if (G.Social.disarmRoomDisconnect) G.Social.disarmRoomDisconnect();
     G.LobbyUI.close();
     G.Game.startRun(cfg);
   }

@@ -159,7 +159,7 @@
         if (room) {
           G.Net.open(room.id, room.isHost, room.host);
           G.Net.syncMembers(room.members.map(m => m.uid));
-        } else if (G.Net.open_) G.Net.close();
+        } else if (G.Net.open_ && !(typeof G === 'object' && G.Coop && G.Coop.active)) G.Net.close();
         if (what === 'room-closed') {
           G.UI.toast('La sala se ha cerrado', 2600);
           if (G.UI.isOpen('scr-lobby')) G.MenuUI.open();
